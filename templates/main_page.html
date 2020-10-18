@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <style>
+        .container-fluid {
+            background-color: rgb(30, 144, 255);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+
+    <section>
+        <div class="container-fluid">
+            <div class="container">
+                <p>
+                    Six Degree of bacon is a game which connect any one in Hollywood
+                    to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
+                    Star which you want to start at and another star you wish to connect
+                    to.
+                </p>
+                <form action="" class="form-inline">
+                    <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2"  id="star1" name="star1">
+                    <label for="star2" class="mb-2 mr-sm-2">To: </label>
+                    <input type="text" class="form-control mb-2 mr-sm-2" id="star2" name="star2">
+                    <div class="form-check-label">
+                        <button type="submit" class="btn btn-success mb-2" onclick="loader()">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function loader() {
+            window.location = 'http://127.0.0.1:5000/loader';
+        }
+    </script>
+{% endblock %}
