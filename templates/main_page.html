@@ -10,7 +10,6 @@
             align-items: center;
             width: 100vw;
             height: 100vh;
-            color: #fff;
             font-family: 'Poppins', sans-serif;
         }
 
@@ -40,6 +39,7 @@
         body {
             background: rgb(30, 144, 255);
             font-family: 'Poppins', sans-serif;
+            color: #fff;
         }
     </style>
 
@@ -63,6 +63,8 @@
             </div>
         </div>
     </div>
+
+    <div id="images"></div>
 
     <svg width="300" height="120" id="clackers">
         <!-- Left arc path -->
@@ -102,8 +104,35 @@
     <script>
         // Displays the loading page
         document.getElementById('button').addEventListener('click', () => {
+            // Gets the inputted values
+            const star1 = document.getElementById('star1').value;
+            const star2 = document.getElementById('star2').value;
+
+            // Displays the loading screen
             document.getElementById('main').style.display = 'none';
             document.getElementById('clackers').style.display = 'block';
+
+            // Server request
+            const request = new XMLHttpRequest();
+            request.open('POST', '/connection')
+
+            // When request finish loading
+            request.onload = () => {
+                const data = JSON.parse(request.responseText); // Extracts the JSON data
+                document.getElementById('clackers').style.display = 'none';
+                for (let [key, value] of Object.entries(data)) {
+                    console.log(`${key}: ${value}`)
+                }
+            }
+
+            // Add data to send with  request
+            const data = new FormData();
+            data.append('star1', star1);
+            data.append('star2', star2);
+
+            // Send request
+            request.send(data)
+            return false;
         });
     </script>
 {% endblock %}

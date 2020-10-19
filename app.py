@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 
 app = Flask(__name__)
 
@@ -55,5 +55,5 @@ def find_connection():
                 if ('jpg' in image_url) or ('png' in image_url) or ('jpeg' in image_url):
                     scraped_images[actor] = image_url
                     break
-
         driver.close()
+        return jsonify(scraped_images)
