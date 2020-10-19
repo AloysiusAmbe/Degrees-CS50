@@ -13,33 +13,97 @@
             color: #fff;
             font-family: 'Poppins', sans-serif;
         }
+
+        .container-fluid h1 {
+            align-self: flex-start;
+            margin: 40px 40px 40px 0;
+        }
+
+        svg {
+            position: absolute;
+        }
+
+        circle:nth-of-type(1) { fill: #ffffff; }
+        circle:nth-of-type(2) { fill: #fcd837; }
+        circle:nth-of-type(3) { fill: #f9a11f; }
+        circle:nth-of-type(4) { fill: #f27c21; }
+
+        #clackers {
+            /*   border: 1px solid white; */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        body {
+            background: rgb(30, 144, 255);
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 
-    <section>
-        <div class="container-fluid">
-            <div class="container">
-                <p>
-                    Six Degree of bacon is a game which connect any one in Hollywood
-                    to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
-                    Star which you want to start at and another star you wish to connect
-                    to.
-                </p>
-                <form action="" class="form-inline">
-                    <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                    <input type="text" class="form-control mb-2 mr-sm-2"  id="star1" name="star1">
-                    <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                    <input type="text" class="form-control mb-2 mr-sm-2" id="star2" name="star2">
-                    <div class="form-check-label">
-                        <button type="submit" class="btn btn-success mb-2" onclick="loader()">Submit</button>
-                    </div>
-                </form>
+    <div class="container-fluid" id="main">
+        <div class="container">
+            <h1>SIX DEGREES OF BACON</h1>
+            <p>
+                Six Degree of bacon is a game which connect any one in Hollywood
+                to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
+                Star which you want to start at and another star you wish to connect
+                to.
+            </p>
+            <div class="form-inline">
+                <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
+                <input type="text" class="form-control mb-2 mr-sm-2"  id="star1" name="star1">
+                <label for="star2" class="mb-2 mr-sm-2">To: </label>
+                <input type="text" class="form-control mb-2 mr-sm-2" id="star2" name="star2">
+                <div class="form-check-label">
+                    <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <svg width="300" height="120" id="clackers">
+        <!-- Left arc path -->
+        <svg>
+        <path id="arc-left-up" fill="none" d="M 90 90 A 90 90 0 0 1 0 0"/>
+        </svg>
+        <!-- Right arc path -->
+        <svg>
+        <path id="arc-right-up" fill="none" d="M 100 90 A 90 90 0 0 0 190 0"/>
+        </svg>
+        
+        <text x="150" y="50" fill="#ffffff" font-family="Helvetica Neue,Helvetica,Arial" font-size="18"
+            text-anchor="middle">
+        L O A D I N G
+        </text>
+        <circle cx="15" cy="15" r="15">
+        <!-- I used a python script to calculate the keyPoints and keyTimes based on a quadratic function. -->
+        <animateMotion dur="1.5s" repeatCount="indefinite"
+            calcMode="linear"
+            keyPoints="0.0;0.19;0.36;0.51;0.64;0.75;0.84;0.91;0.96;0.99;1.0;0.99;0.96;0.91;0.84;0.75;0.64;0.51;0.36;0.19;0.0;0.0;0.05;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0"
+            keyTimes="0.0;0.025;0.05;0.075;0.1;0.125;0.15;0.175;0.2;0.225;0.25;0.275;0.3;0.325;0.35;0.375;0.4;0.425;0.45;0.475;0.5;0.525;0.55;0.575;0.6;0.625;0.65;0.675;0.7;0.725;0.75;0.775;0.8;0.825;0.85;0.875;0.9;0.925;0.95;0.975;1.0">
+            <mpath xlink:href="#arc-left-up"/>
+        </animateMotion>
+        </circle>
+        <circle cx="135" cy="105" r="15" />
+        <circle cx="165" cy="105" r="15" />
+        <circle cx="95" cy="15" r="15">
+        <animateMotion dur="1.5s" repeatCount="indefinite"
+            calcMode="linear"
+            keyPoints="0.0;0.0;0.05;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0.0;0.19;0.36;0.51;0.64;0.75;0.84;0.91;0.96;0.99;1.0;0.99;0.96;0.91;0.84;0.75;0.64;0.51;0.36;0.19;0.0"
+            keyTimes="0.0;0.025;0.05;0.075;0.1;0.125;0.15;0.175;0.2;0.225;0.25;0.275;0.3;0.325;0.35;0.375;0.4;0.425;0.45;0.475;0.5;0.525;0.55;0.575;0.6;0.625;0.65;0.675;0.7;0.725;0.75;0.775;0.8;0.825;0.85;0.875;0.9;0.925;0.95;0.975;1.0">
+            <mpath xlink:href="#arc-right-up"/>
+        </animateMotion>
+        </circle>
+    </svg>
 
     <script>
-        function loader() {
-            window.location = 'http://127.0.0.1:5000/loader';
-        }
+        // Displays the loading page
+        document.getElementById('button').addEventListener('click', () => {
+            document.getElementById('main').style.display = 'none';
+            document.getElementById('clackers').style.display = 'block';
+        });
     </script>
 {% endblock %}
