@@ -1,7 +1,14 @@
+
 {% extends "layout.html" %}
 
 {% block body %}
     <style>
+        body {
+            background: rgb(30, 144, 255);
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+        }
+
         .container-fluid {
             background-color: rgb(30, 144, 255);
             display: flex;
@@ -36,10 +43,47 @@
             display: none;
         }
 
-        body {
-            background: rgb(30, 144, 255);
-            font-family: 'Poppins', sans-serif;
-            color: #fff;
+        #images {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .image {
+            width: 320px;
+            height: 480px;
+            margin: 8px;
+            border: 2px solid #fff;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        .image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            object-fit: cover;
+            border: none;
+        }
+
+        .image .text {
+            background-color: #ffffff;
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            color: #000000;
+            padding: 16px;
+            border-radius: 0 0 16px 16px;
+            text-align: center;
         }
     </style>
 
@@ -54,9 +98,9 @@
             </p>
             <div class="form-inline">
                 <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2"  id="star1" name="star1">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off"  id="star1" name="star1">
                 <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                <input type="text" class="form-control mb-2 mr-sm-2" id="star2" name="star2">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2">
                 <div class="form-check-label">
                     <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
                 </div>
@@ -120,12 +164,39 @@
             request.onload = () => {
                 const data = JSON.parse(request.responseText); // Extracts the JSON data
                 document.getElementById('clackers').style.display = 'none';
+
+                // Loops through the extracted JSON data
                 for (let [key, value] of Object.entries(data)) {
                     console.log(`${key}: ${value}`)
+
+                    let images = document.getElementById('images'); // Gets images div
+                    // Image div for the scraped image
+                    let image = document.createElement('div');
+                    image.className = 'image';
+
+                    // img element created
+                    let img = document.createElement('img');
+                    img.src = `${value}`;
+                    img.alt = `${key}`;
+
+                    // img tag and image div are added to the DOM
+                    image.appendChild(img);
+                    images.appendChild(image);
+
+                    // Creates a div and span for the actor's name
+                    let image_text = document.createElement('div');
+                    image_text.className = 'text';
+                    let text = document.createElement('h5');
+                    text.innerHTML = `${key}`;
+                    image_text.appendChild(text);
+                    image.appendChild(image_text);
+
+                    // Makes the images div visible
+                    images.style.display = 'flex';
                 }
             }
 
-            // Add data to send with  request
+            // Add data to send with request
             const data = new FormData();
             data.append('star1', star1);
             data.append('star2', star2);
