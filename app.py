@@ -46,7 +46,7 @@ def find_connection():
             driver.get(url)
 
             # Scraping the images
-            img_url = driver.find_element_by_xpath(f'//*[@id="islrg"]/div[1]/div[1]/a[1]/div[1]/img')
+            img_url = driver.find_element_by_xpath('//*[@id="islrg"]/div[1]/div[1]/a[1]/div[1]/img')
             img_url.click()
             time.sleep(2)
             images = driver.find_elements_by_class_name("n3VNCb")
