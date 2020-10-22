@@ -17,25 +17,25 @@ def load_data(path_name: str):
     '''
     # Loads movies
     movies_reader = csv.reader(open(f'{path_name}/movies.csv', encoding='utf-8'))
-    for id, title, year in movies_reader:
-        movies[id] = {
-            'title': str(title),
+    for movie_id, title, year in movies_reader:
+        movies[movie_id] = {
+            'title': title,
             'year': year,
             'stars': set()
         }
 
     # Loads people
     people_reader = csv.reader(open(f'{path_name}/people.csv', encoding='utf-8'))
-    for id, name, birth in people_reader:
-        people[id] = {
-            'name': str(name),
+    for person_id, name, birth in people_reader:
+        people[person_id] = {
+            'name': name,
             'birth': birth,
             'movies': set()
         }
         if name.lower() not in names:
-            names[name.lower()] = {id}
+            names[name.lower()] = {person_id}
         else:
-            names[name.lower()].add(id)
+            names[name.lower()].add(person_id)
 
     # Loads stars
     stars_reader = csv.reader(open(f'{path_name}/stars.csv', encoding='utf-8'))
@@ -55,23 +55,27 @@ def main():
     load_data(path_name='large')
     print('Data Loaded!\n')
 
-    find_connection()
+    while True:
+        path =  find_connection()
+        if path == None:
+            return
+        
+        degrees = len(path)
+        for p in path:
+            print(f'{people[p.star_1_id]["name"]} and {people[p.star_2_id]["name"]} in "{movies[p.movie_id]["title"]}"')
 
-
-def find_connection():
+def find_connection(start: str, end: str):
     '''
     Finds and returns the connection between two actors
     '''
 
     # Prompts for the first star
-    start = str(input('Enter start name: ')).title()
     start_id = get_person_id(name=start)
     if start_id == None:
         print(f'{start} is not in our dataset.')
         return
 
     # Prompts for the second star
-    end = str(input('Enter start name: ')).title()
     end_id = get_person_id(name=end)
     if end_id == None:
         print(f'{end} is not in our dataset.')
@@ -88,24 +92,25 @@ def find_connection():
     # Checking all the neighbors of the start and adds them to the queue
     for movie_id, star_id in neighbors:
         if star_id == end_id:
-            print(f'{people[start_id]["name"]} in "{movies[movie_id]["title"]}" with {people[end_id]["name"]}')
-            return
+            print('Found')
+            # print(f'{people[start_id]["name"]} in "{movies[movie_id]["title"]}" with {people[end_id]["name"]}')
+            return [Node(star_1_id=start_id, movie_id=movie_id, star_2_id=star_id)]
 
-        print(f'{people[start_id]["name"]} "{movies[movie_id]["title"]}" {people[star_id]["name"]}')
         if star_id not in visited_ids:
-            print('Added')
             node = Node(star_1_id=start_id, movie_id=movie_id, star_2_id=star_id)
             queue.push(node=node)
             visited_ids.add(star_id)
-        print()
+
+    neighbors_of_start = neighbors
 
     # Loops till queue is empty
     while(not queue.isEmpty()):
+        path = []
         # Get the current node and add it to the visited set
         current_node = queue.pop()
         current_star_id = current_node.star_2_id
         visited_ids.add(current_star_id)
-        print(f"{people[current_node.star_1_id]['name']}   '{movies[current_node.movie_id]['title']}'   {people[current_star_id]['name']}")
+        path.append(current_node)
 
         # Gets the neighbors of the current node's second star and adds them to the queue
         neighbors = get_neighbors(person_id=current_star_id)
@@ -114,7 +119,15 @@ def find_connection():
             # Checks if connection has been found
             if star_id == end_id:
                 print('found')
-                return
+
+                # Gets the first connection
+                for start_neighbor_movie_id, start_neighbor_star_id in neighbors_of_start:
+                    if (start_neighbor_star_id in [p.star_1_id for p in path]) and (start_neighbor_star_id != start_id):
+                        path.insert(0, Node(star_1_id=start_id, movie_id=start_neighbor_movie_id, star_2_id=start_neighbor_star_id))
+                        break
+
+                path.append(Node(star_1_id=current_star_id, movie_id=movie_id, star_2_id=star_id))
+                return path
 
             # Adds a star's id to the queue only if it has not been visited
             if star_id not in visited_ids:
@@ -123,6 +136,7 @@ def find_connection():
     
     else:
         print('No connection found!')
+        return None
 
 
 def get_neighbors(person_id):
@@ -135,8 +149,8 @@ def get_neighbors(person_id):
         movie = movies[movie_id]['title']
         stars_in_movie = movies[movie_id]['stars']
         for star_id in stars_in_movie:
-            if star_id != person_id:
-                neighbors.add((movie_id, star_id))
+            # if star_id != person_id:
+            neighbors.add((movie_id, star_id))
     return neighbors
 
 
