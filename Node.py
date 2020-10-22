@@ -13,9 +13,6 @@ class Stack():
     def push(self, node):
         self.frontier.append(node)
 
-    def contains_state(self, state):
-        return any(node.star_2_id == state for node in self.frontier)
-
     def isEmpty(self):
         return len(self.frontier) == 0
 
