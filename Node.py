@@ -8,7 +8,6 @@ class Node():
 class Stack():
     def __init__(self):
         self.frontier = []
-        self.all_paths = []
 
     def push(self, node):
         self.frontier.append(node)
