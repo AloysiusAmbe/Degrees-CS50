@@ -52,7 +52,7 @@ def main():
     Main function call
     '''
     print('Loading data...')
-    load_data(path_name='large')
+    load_data(path_name='small')
     print('Data Loaded!\n')
 
     while True:
