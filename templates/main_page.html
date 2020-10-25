@@ -98,12 +98,15 @@
             </p>
             <div class="form-inline">
                 <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off"  id="star1" name="star1">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1">
                 <label for="star2" class="mb-2 mr-sm-2">To: </label>
                 <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2">
                 <div class="form-check-label">
                     <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
                 </div>
+            </div>
+            <div class="suggesrions">
+                <p>Suggestions: <span id="txtHint"></span></p>
             </div>
         </div>
     </div>
@@ -158,7 +161,7 @@
 
             // Server request
             const request = new XMLHttpRequest();
-            request.open('POST', '/connection')
+            request.open('POST', '/connection');
 
             // When request finish loading
             request.onload = () => {
@@ -205,5 +208,47 @@
             request.send(data)
             return false;
         });
+
+        // Shows suggestions for the star1 input field
+        const star1 = document.getElementById('star1');
+        document.getElementById('star1').addEventListener('keyup', () => {
+            showHint(star1.value, star1);
+        });
+
+        // Shows suggestions for the star2 input field
+        const star2 = document.getElementById('star2');
+        document.getElementById('star2').addEventListener('keyup', () => {
+            showHint(star2.value, star2);
+        });
+
+        // Makes a server request to get name suggestions
+        function showHint(str, elementName) {
+            str = str.trim();
+            if (str.length == 0) {
+                document.getElementById("txtHint").innerHTML = "";
+                return;
+            }
+
+            const request = new XMLHttpRequest;
+            request.open('POST', '/gethint');
+
+            request.onload = () => {
+                const data = JSON.parse(request.responseText); // Extracts the JSON data
+                console.log(data);
+                
+                let suggestions = '';
+                for (let [key, value] of Object.entries(data)) {
+                    suggestions += value + ', ';
+                }
+                document.getElementById('txtHint').innerHTML = suggestions;
+            }
+
+            const data = new FormData();
+            data.append('input', str);
+
+            // Send request
+            request.send(data);
+            return false;
+        }
     </script>
 {% endblock %}
