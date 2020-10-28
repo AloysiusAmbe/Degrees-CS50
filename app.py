@@ -8,7 +8,7 @@ import connections
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-connections.load_data('large')
+connections.load_data('small')
 
 @app.route("/")
 def index():
@@ -37,19 +37,11 @@ def find_connection():
         if path == None:
             return 'No path'
 
-        connection = dict()
         actors = list()
-        counter = 1
         for p in path:
-            connection[counter] = {
-                'star1': connections.people[p.star_1_id]["name"],
-                'star2': connections.people[p.star_2_id]["name"],
-                'movie': connections.movies[p.movie_id]["title"]
-                }
             actors.append(connections.people[p.star_1_id]["name"])
             actors.append(connections.movies[p.movie_id]["title"])
             actors.append(connections.people[p.star_2_id]["name"])
-            counter += 1
 
         # Stores the url of the images
         scraped_images = dict()
