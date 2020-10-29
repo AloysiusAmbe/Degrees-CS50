@@ -64,22 +64,10 @@ def main():
         for p in path:
             print(f'{people[p.star_1_id]["name"]} and {people[p.star_2_id]["name"]} in "{movies[p.movie_id]["title"]}"')
 
-def find_connection(start: str, end: str):
+def find_connection(start_id, end_id):
     '''
     Finds and returns the connection between two actors
     '''
-
-    # Prompts for the first star
-    start_id = get_person_id(name=start)
-    if start_id == None:
-        print(f'{start} is not in our dataset.')
-        return
-
-    # Prompts for the second star
-    end_id = get_person_id(name=end)
-    if end_id == None:
-        print(f'{end} is not in our dataset.')
-        return
 
     # Keeps track of all the star ids which have been visited
     visited_ids = set()
