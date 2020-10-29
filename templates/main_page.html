@@ -51,6 +51,7 @@
             border: 2px solid #fff;
             border-radius: 16px;
             position: relative;
+            transition: ease-in 0.2s;
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         }
 
@@ -97,6 +98,19 @@
             position: absolute;
             left: 10px;
         }
+
+        #message {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: none;
+            left: 50%;
+            top: 50%;
+            font-size: 20px;
+        }
+
+        input {
+            z-index: 100000;
+        }
     </style>
 
     <div class="container-fluid" id="main">
@@ -110,9 +124,9 @@
             </p>
             <div class="form-inline">
                 <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="emma watson">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="tom cruise">
                 <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="Jennifer lawrence">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="tom hanks">
                 <div class="form-check-label">
                     <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
                 </div>
@@ -125,10 +139,12 @@
 
     <div class="container-fluid">
         <div id="images">
-            <input class="circle-btn" id="circle-btn-right" type="submit" value=">">
-            <input class="circle-btn" id="circle-btn-left" type="submit" value="<">
+            <input class="circle-btn btn-success" id="circle-btn-right" type="submit" value=">">
+            <input class="circle-btn btn-success" id="circle-btn-left" type="submit" value="<">
         </div>
     </div>
+
+    <div id="message"></div>
 
     <svg width="300" height="120" id="clackers">
         <!-- Left arc path -->
@@ -166,6 +182,10 @@
     </svg>
 
     <script>
+        var scraped_data;
+        var current_slide = 0;
+        var images = document.getElementById('images'); // Gets images div
+
         // Displays the loading page
         document.getElementById('button').addEventListener('click', () => {
             // Gets the inputted values
@@ -183,11 +203,18 @@
             // When request finish loading
             request.onload = () => {
                 var data = JSON.parse(request.responseText); // Extracts the JSON data
+                scraped_data = data;
                 document.getElementById('clackers').style.display = 'none';
 
+                if (data.success == false) {
+                    let message = document.getElementById('message');
+                    message.innerHTML = data.message;
+                    message.style.display = 'flex';
+                    return;
+                }
+
                 // Loops through the extracted JSON data
-                for (let [key, value] of Object.entries(data)) {
-                    let images = document.getElementById('images'); // Gets images div
+                for (let [key, value] of Object.entries(data.route0)) {
                     // Image div for the scraped image
                     console.log(`${key}: ${value}`)
                     let image = document.createElement('div');
@@ -195,6 +222,7 @@
 
                     // img element created
                     let img = document.createElement('img');
+                    img.className = 'main-img';
                     img.src = `${value}`;
                     img.alt = `${key}`;
 
@@ -206,13 +234,13 @@
                     let image_text = document.createElement('div');
                     image_text.className = 'text';
                     let text = document.createElement('h5');
+                    text.className = 'main-text';
                     text.innerHTML = `${key}`;
                     image_text.appendChild(text);
                     image.appendChild(image_text);
-
-                    // Makes the images div visible
-                    images.style.display = 'flex';
                 }
+                // Makes the images div visible
+                images.style.display = 'flex';
             }
 
             // Add data to send with request
@@ -223,6 +251,64 @@
             // Send request
             request.send(data)
             return false;
+        });
+
+        document.getElementById('circle-btn-right').addEventListener('click', () => {
+            // Keeps track of what slide we are on
+            let scrapedDataLength = Object.keys(scraped_data).length;
+            if (current_slide == scrapedDataLength - 1)
+                current_slide = current_slide;
+
+            else
+                current_slide++;
+
+            // Gets the imgs and texts tags
+            let images = document.querySelectorAll('.main-img');
+            let texts = document.querySelectorAll('.main-text');
+
+            // Sets an index to loop over the selected tags
+            let index = 0;
+            let key_index = "route" + current_slide;
+            
+            for (let [key, value] of Object.entries(scraped_data[`${key_index}`])) {
+                // Changes the src and alt value of the img tags
+                let img = images[index];
+                img.src = value;
+                img.alt = key;
+
+                // Changes the text to match the scraped data
+                texts[index].innerHTML = key;
+                index++;
+            }
+        });
+
+        document.getElementById('circle-btn-left').addEventListener('click', () => {
+            // Keeps track of what slide we are on
+            if (current_slide == 0)
+                current_slide = current_slide;
+
+            else
+                current_slide--;
+
+            // Gets the imgs and texts tags
+            let images = document.querySelectorAll('.main-img');
+            let texts = document.querySelectorAll('.main-text');
+            let scrapedDataLength = Object.keys(scraped_data).length;
+
+            // Sets an index to loop over the selected tags
+            let index = 0;
+            let key_index = "route" + current_slide;
+            
+            for (let [key, value] of Object.entries(scraped_data[`${key_index}`])) {
+                // Changes the src and alt value of the img tags
+                let img = images[index];
+                img.src = value;
+                img.alt = key;
+
+                // Changes the text to match the scraped data
+                texts[index].innerHTML = key;
+                index++;
+            }
         });
 
         // Shows suggestions for the star1 input field
@@ -266,5 +352,7 @@
             request.send(data);
             return false;
         }
+
+
     </script>
 {% endblock %}
