@@ -91,7 +91,7 @@ def get_url(search_query, driver, search_filter):
 
     # Making the search url
     if search_filter == 'movie':
-        url = f'https://www.google.com/search?q={query}+movie&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+        url = f'https://www.google.com/search?q={query}+movie+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     else:
         url = f'https://www.google.com/search?q={query}+actor&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     driver.get(url)
