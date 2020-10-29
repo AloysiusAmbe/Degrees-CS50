@@ -8,7 +8,7 @@ import connections
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-connections.load_data('small')
+connections.load_data('large')
 
 @app.route("/")
 def index():
@@ -22,55 +22,90 @@ def find_connection():
 
     # Post request
     else:
+        # Getting start and endpoints
+        star1 = request.form.get('star1')
+        star2 = request.form.get('star2')
+
+        # Gets the start and end ids for the inputed stars
+        start_id = connections.get_person_id(star1)
+        end_id = connections.get_person_id(star2)
+
+        if start_id == None:
+            error = {
+                'success': False,
+                'message': f'"{star1}" not in out dataset'
+            }
+            return jsonify(error)
+
+        if end_id == None:
+            error = {
+                'success': False,
+                'message': f'"{star2}" not in out dataset'
+            }
+            return jsonify(error)
+
+        # Calls function to find the connection between the two actors
+        path = connections.find_connection(start_id, end_id)
+        if path == None:
+            error = {
+                'success': False,
+                'message': 'No path found'}
+            return jsonify(error)
+
         # Selenium setup
         PATH = 'C:\Program Files (x86)\Chromedriver.exe'
         options = Options()
         options.add_argument('--headless')
         driver = webdriver.Chrome(PATH, options=options)
 
-        # Getting start and endpoints
-        star1 = request.form.get('star1')
-        star2 = request.form.get('star2')
-
-        # Calls function to find the connection between the two actors
-        path = connections.find_connection(start=star1, end=star2)
-        if path == None:
-            return 'No path'
-
-        actors = list()
-        for p in path:
-            actors.append(connections.people[p.star_1_id]["name"])
-            actors.append(connections.movies[p.movie_id]["title"])
-            actors.append(connections.people[p.star_2_id]["name"])
-
-        # Stores the url of the images
         scraped_images = dict()
-        for actor in actors:
-            # Formatting the search query
-            search_query = actor
-            search_query = search_query.split()
-            query = ''
-            for substring in search_query:
-                query += substring
-                query += '+'
+        key_index = 0
+        for p in path:
+            star1 = connections.people[p.star_1_id]["name"]
+            movie_title = connections.movies[p.movie_id]["title"]
+            star2 = connections.people[p.star_2_id]["name"]
 
-            # Making the search url
-            url = f'https://www.google.com/search?q={query}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
-            driver.get(url)
+            scraped_images[f'route{key_index}'] = {
+                star1: get_url(star1, driver, 'actor'),
+                movie_title: get_url(movie_title, driver, 'movie'),
+                star2: get_url(star2, driver, 'actor')
+            }
+            key_index += 1
 
-            # Scraping the images
-            img_url = driver.find_element_by_xpath('//*[@id="islrg"]/div[1]/div[1]/a[1]/div[1]/img')
-            img_url.click()
-            time.sleep(2)
-            images = driver.find_elements_by_class_name("n3VNCb")
-            for image in images:
-                image_url = image.get_attribute('src')
-                if ('jpg' in image_url) or ('png' in image_url) or ('jpeg' in image_url):
-                    scraped_images[actor] = image_url
-                    break
         driver.close()
         print(scraped_images)
         return jsonify(scraped_images)
+
+
+def get_url(search_query, driver, search_filter):
+    '''
+    Scrapes for the image based on the search query entered.
+    Returns the images url
+    '''
+    # Formatting the search query
+    search_query = search_query.split()
+    query = ''
+    for substring in search_query:
+        query += substring
+        query += '+'
+
+    # Making the search url
+    if search_filter == 'movie':
+        url = f'https://www.google.com/search?q={query}+movie&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+    else:
+        url = f'https://www.google.com/search?q={query}+actor&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+    driver.get(url)
+
+    # Scraping the images
+    img_url = driver.find_element_by_xpath('//*[@id="islrg"]/div[1]/div[1]/a[1]/div[1]/img')
+    img_url.click()
+    time.sleep(2)
+    images = driver.find_elements_by_class_name("n3VNCb")
+    for image in images:
+        image_url = image.get_attribute('src')
+        if ('jpg' in image_url) or ('png' in image_url) or ('jpeg' in image_url):
+            return image_url
+    return None
 
 
 @app.route("/gethint", methods=["POST", "GET"])
