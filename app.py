@@ -8,7 +8,8 @@ import connections
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-connections.load_data('large')
+
+connections.load_data('large') # Select to load 'large' or 'small' data
 
 @app.route("/")
 def index():
@@ -25,6 +26,7 @@ def find_connection():
         # Getting start and endpoints
         star1 = request.form.get('star1')
         star2 = request.form.get('star2')
+        speed_option = request.form.get('speed_option')
 
         # Gets the start and end ids for the inputed stars
         start_id = connections.get_person_id(star1)
@@ -33,14 +35,14 @@ def find_connection():
         if start_id == None:
             error = {
                 'success': False,
-                'message': f'"{star1}" not in out dataset'
+                'message': f'"{star1}" is not in our dataset'
             }
             return jsonify(error)
 
         if end_id == None:
             error = {
                 'success': False,
-                'message': f'"{star2}" not in out dataset'
+                'message': f'"{star2}" is not in our dataset'
             }
             return jsonify(error)
 
@@ -51,6 +53,23 @@ def find_connection():
                 'success': False,
                 'message': 'No path found'}
             return jsonify(error)
+
+        # If the user opts to get the connecstion between 2 stars fast
+        if speed_option == 'fast':
+            connection = dict()
+            counter = 0
+            for p in path:
+                connection[f'route{counter}'] = {
+                    'start': connections.people[p.star_1_id]["name"],
+                    'movie': connections.movies[p.movie_id]["title"],
+                    'end': connections.people[p.star_2_id]["name"]
+                }
+                counter += 1
+            return jsonify(connection)
+
+        # User chooses to use wikipedia images - fast but image not guarenteed
+        if speed_option == 'wiki':
+            pass
 
         # Selenium setup
         PATH = 'C:\Program Files (x86)\Chromedriver.exe'
@@ -66,21 +85,20 @@ def find_connection():
             star2 = connections.people[p.star_2_id]["name"]
 
             scraped_images[f'route{key_index}'] = {
-                star1: get_url(star1, driver, 'actor'),
-                movie_title: get_url(movie_title, driver, 'movie'),
-                star2: get_url(star2, driver, 'actor')
+                star1: get_google_images(star1, driver, 'actor'),
+                movie_title: get_google_images(movie_title, driver, 'movie'),
+                star2: get_google_images(star2, driver, 'actor')
             }
             key_index += 1
 
         driver.close()
-        print(scraped_images)
         return jsonify(scraped_images)
 
 
-def get_url(search_query, driver, search_filter):
+def get_google_images(search_query, driver, search_filter):
     '''
-    Scrapes for the image based on the search query entered.
-    Returns the images url
+    Scrapes for the image from google based on the search query entered.
+    Returns the image's url.
     '''
     # Formatting the search query
     search_query = search_query.split()
@@ -108,6 +126,14 @@ def get_url(search_query, driver, search_filter):
     return None
 
 
+def get_wiki_images(search_query):
+    '''
+    User opsts to get images from wikipedia.
+    Is fast but the images are not guarenteed to be displayed.
+    '''
+    pass
+
+
 @app.route("/gethint", methods=["POST", "GET"])
 def hint():
     # Get request redirects user to homepage
@@ -115,22 +141,24 @@ def hint():
         return redirect(url_for('index'))
 
     else:
-        names = connections.names
-
         # Getting the values entered in the webpage
         user_input = request.form.get('input').lower()
-        suggestions = get_hint(user_input=user_input, names=names)
+        suggestions = get_hint(user_input=user_input, names=connections.names)
 
         return jsonify(suggestions)
 
 
 def get_hint(user_input: str, names: dict):
+    '''
+    Returns a dictionary of suggestions based on the user's
+    input. Allows a maximum of 10 suggestions.
+    '''
     suggestions = dict()
     input_length = len(user_input)
     counter = 1
-    for key in names.keys():
-        if user_input in key[:input_length]:
-            suggestions[counter] = key.title()
+    for actor_name in names.keys():
+        if user_input in actor_name[:input_length]:
+            suggestions[counter] = actor_name.title()
             counter += 1
 
         if counter == 10:
