@@ -35,6 +35,22 @@
             transform: translate(-50%, -50%);
         }
 
+        #fast {
+            display: none;
+            flex-direction: column;
+        }
+
+        #fast .text-div {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #fast .text-div div {
+            margin: 20px 0 20px 0;
+            padding: 0 5px 0 5px;
+        }
+
         #images {
             display: none;
             width: 100vw;
@@ -65,6 +81,7 @@
             border-radius: 16px;
             object-fit: cover;
             border: none;
+            transition: 0.2s;
         }
 
         .image .text {
@@ -129,6 +146,8 @@
             </div>
             <input class="circle-btn btn-success" id="circle-btn-right" type="submit" value=">">
         </div>
+
+        <div id="fast"></div>
     </div>
 
     <div class="container-fluid" id="main">
@@ -150,6 +169,21 @@
                     <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="donnie yen">
                     <div class="form-check-label">
                         <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
+                    </div>
+                    <div class="form-check-inline m-4">
+                        <label class="form-check-label">
+                          <input type="radio" class="form-check-input" name="option" checked="checked" value="Fast">Fast
+                        </label>
+                      </div>
+                      <div class="form-check-inline">
+                        <label class="form-check-label">
+                          <input type="radio" class="form-check-input" name="option" value="slow">Slow W/ Images
+                        </label>
+                      </div>
+                      <div class="form-check-inline">
+                        <label class="form-check-label">
+                          <input type="radio" class="form-check-input" name="option" value="wiki">Slow W/ wiki images
+                        </label>
                     </div>
                 </div>
                 <div id="suggestions">
@@ -204,8 +238,14 @@
         var star1 = document.getElementById('star1');
         var star2 = document.getElementById('star2');
 
-        // Displays the loading page
+        // Displays the loading page and sends the entered data
+        // to the server to get the connection between two actors
         document.getElementById('button').addEventListener('click', () => {
+            // Gets the chosen speed by the user
+            let speed_option = document.querySelector('input[name=option]:checked').value;
+            speed_option = speed_option.toLowerCase();
+
+            console.log(speed_option);
             // Gets the inputted values
             const star1_vlaue = star1.value;
             const star2_value = star2.value;
@@ -214,11 +254,13 @@
             const clackers = document.getElementById('clackers');
             const main_content = document.getElementById('main');
             const main_images = document.getElementById('images');
+            const fast_div = document.querySelector('#fast');
             let message = document.getElementById('message');
 
             // Displays the loading screen and hides other elements
             main_content.style.display = 'none';
             main_images.style.display = 'none';
+            fast_div.style.display = 'none';
             clackers.style.display = 'block';
             message.style.display = 'none';
 
@@ -241,15 +283,46 @@
                     return;
                 }
 
-                // Function call to change img attribute
-                let key_index = "route0";
-                changesImgAtributes(key_index);
+                // If the user wants the connection to
+                // be displayed fast and without images
+                if (speed_option == 'fast') {
+                    removeAllChildNodes(fast_div);
+                    for (let [key, value] of Object.entries(data)) {
+                        let text_div = document.createElement('div');
+                        text_div.className = 'text-div';
+                        let index = 0;
+                        for (let [key, val] of Object.entries(value)) {
+                            let div = document.createElement('div');
+                            let h5 = document.createElement('h5');
+                            if (index == 0) {
+                                h5.innerHTML = `${val} stars in `;
+                            }
+                            if (index == 1) {
+                                h5.innerHTML = `"${val}" with `;
+                            }
+                            if (index == 2) {
+                                h5.innerHTML = `${val}.`;
+                            }
 
-                // Makes the images div visible
-                main_images.style.display = 'flex';
+                            div.appendChild(h5);
+                            text_div.appendChild(div);
+                            index++;
+                        }
+                        fast_div.appendChild(text_div);
+                    }
+                    fast_div.style.display = 'flex';
+                }
+
+                else {
+                    // Function call to change img attribute
+                    changesImgAtributes('route0');
+
+                    // Makes the images div visible
+                    main_images.style.display = 'flex';
+                }
+
                 main_content.style.display = 'flex';
                 main_content.style.height = 'auto';
-
                 document.getElementById('dont-show').style.display = 'none';
                 document.getElementById('show-after-load').style.height = '15vh';
             }
@@ -258,11 +331,19 @@
             const data = new FormData();
             data.append('star1', star1_vlaue);
             data.append('star2', star2_value);
+            data.append('speed_option', speed_option);
 
             // Send request
             request.send(data)
             return false;
         });
+
+        // Clears div so results for new query can be put on web page
+        function removeAllChildNodes(parent) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+        }
 
         // Moves carousel to the right
         document.getElementById('circle-btn-right').addEventListener('click', () => {
