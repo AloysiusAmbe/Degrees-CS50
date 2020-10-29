@@ -10,6 +10,7 @@
             align-items: center;
             width: 100%;
             height: 100vh;
+            transition: 0.2s ease-in;
         }
 
         #main h1 {
@@ -37,7 +38,7 @@
         #images {
             display: none;
             width: 100vw;
-            height: 100vh;
+            height: 85vh;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
@@ -89,22 +90,12 @@
             font-size:22px;
         }
 
-        #images #circle-btn-right {
-            position: absolute;
-            right: 10px;
-        }
-
-        #images #circle-btn-left {
-            position: absolute;
-            left: 10px;
-        }
-
         #message {
             position: absolute;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -5%);
             display: none;
             left: 50%;
-            top: 50%;
+            top: 5%;
             font-size: 20px;
         }
 
@@ -113,38 +104,62 @@
         }
     </style>
 
-    <div class="container-fluid" id="main">
-        <div class="container">
-            <h1>SIX DEGREES OF BACON</h1>
-            <p>
-                Six Degree of bacon is a game which connect any one in Hollywood
-                to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
-                Star which you want to start at and another star you wish to connect
-                to.
-            </p>
-            <div class="form-inline">
-                <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="tom cruise">
-                <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="tom hanks">
-                <div class="form-check-label">
-                    <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
-                </div>
-            </div>
-            <div class="suggestions">
-                <p>Suggestions: <span id="txtHint"></span></p>
-            </div>
-        </div>
-    </div>
-
     <div class="container-fluid">
         <div id="images">
-            <input class="circle-btn btn-success" id="circle-btn-right" type="submit" value=">">
             <input class="circle-btn btn-success" id="circle-btn-left" type="submit" value="<">
+            <div class="image">
+                <img src="" alt="" class="main-img">
+                <div class="text">
+                    <h5 class="main-text"></h5>
+                </div>
+            </div>
+            <i class="fas fa-arrow-right fa-lg"></i>
+            <div class="image">
+                <img src="" alt="" class="main-img">
+                <div class="text">
+                    <h5 class="main-text"></h5>
+                </div>
+            </div>
+            <i class="fas fa-arrow-left fa-lg"></i>
+            <div class="image">
+                <img src="" alt="" class="main-img">
+                <div class="text">
+                    <h5 class="main-text"></h5>
+                </div>
+            </div>
+            <input class="circle-btn btn-success" id="circle-btn-right" type="submit" value=">">
         </div>
     </div>
 
-    <div id="message"></div>
+    <div class="container-fluid" id="main">
+        <div class="container">
+            <div id="dont-show">
+                <h1>SIX DEGREES OF BACON</h1>
+                <p>
+                    Six Degree of bacon is a game which connect any one in Hollywood
+                    to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
+                    Star which you want to start at and another star you wish to connect
+                    to.
+                </p>
+            </div>
+            <div id="show-after-load">
+                <div class="form-inline">
+                    <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="vin diesel">
+                    <label for="star2" class="mb-2 mr-sm-2">To: </label>
+                    <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="donnie yen">
+                    <div class="form-check-label">
+                        <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
+                    </div>
+                </div>
+                <div id="suggestions">
+                    <p>Suggestions: <span id="txtHint"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message" class="alert alert-danger"></div>
 
     <svg width="300" height="120" id="clackers">
         <!-- Left arc path -->
@@ -182,19 +197,30 @@
     </svg>
 
     <script>
+        // Initializing needed variables
         var scraped_data;
         var current_slide = 0;
         var images = document.getElementById('images'); // Gets images div
+        var star1 = document.getElementById('star1');
+        var star2 = document.getElementById('star2');
 
         // Displays the loading page
         document.getElementById('button').addEventListener('click', () => {
             // Gets the inputted values
-            const star1 = document.getElementById('star1').value;
-            const star2 = document.getElementById('star2').value;
+            const star1_vlaue = star1.value;
+            const star2_value = star2.value;
 
-            // Displays the loading screen
-            document.getElementById('main').style.display = 'none';
-            document.getElementById('clackers').style.display = 'block';
+            // Getting needed elements
+            const clackers = document.getElementById('clackers');
+            const main_content = document.getElementById('main');
+            const main_images = document.getElementById('images');
+            let message = document.getElementById('message');
+
+            // Displays the loading screen and hides other elements
+            main_content.style.display = 'none';
+            main_images.style.display = 'none';
+            clackers.style.display = 'block';
+            message.style.display = 'none';
 
             // Server request
             const request = new XMLHttpRequest();
@@ -204,96 +230,66 @@
             request.onload = () => {
                 var data = JSON.parse(request.responseText); // Extracts the JSON data
                 scraped_data = data;
-                document.getElementById('clackers').style.display = 'none';
+                clackers.style.display = 'none';
 
+                // Checks whether there was a problem
                 if (data.success == false) {
-                    let message = document.getElementById('message');
                     message.innerHTML = data.message;
                     message.style.display = 'flex';
+
+                    main_content.style.display = 'flex';
                     return;
                 }
 
-                // Loops through the extracted JSON data
-                for (let [key, value] of Object.entries(data.route0)) {
-                    // Image div for the scraped image
-                    console.log(`${key}: ${value}`)
-                    let image = document.createElement('div');
-                    image.className = 'image';
+                // Function call to change img attribute
+                let key_index = "route0";
+                changesImgAtributes(key_index);
 
-                    // img element created
-                    let img = document.createElement('img');
-                    img.className = 'main-img';
-                    img.src = `${value}`;
-                    img.alt = `${key}`;
-
-                    // img tag and image div are added to the DOM
-                    image.appendChild(img);
-                    images.appendChild(image);
-
-                    // Creates a div and span for the actor's name
-                    let image_text = document.createElement('div');
-                    image_text.className = 'text';
-                    let text = document.createElement('h5');
-                    text.className = 'main-text';
-                    text.innerHTML = `${key}`;
-                    image_text.appendChild(text);
-                    image.appendChild(image_text);
-                }
                 // Makes the images div visible
-                images.style.display = 'flex';
+                main_images.style.display = 'flex';
+                main_content.style.display = 'flex';
+                main_content.style.height = 'auto';
+
+                document.getElementById('dont-show').style.display = 'none';
+                document.getElementById('show-after-load').style.height = '15vh';
             }
 
             // Add data to send with request
             const data = new FormData();
-            data.append('star1', star1);
-            data.append('star2', star2);
+            data.append('star1', star1_vlaue);
+            data.append('star2', star2_value);
 
             // Send request
             request.send(data)
             return false;
         });
 
+        // Moves carousel to the right
         document.getElementById('circle-btn-right').addEventListener('click', () => {
-            // Keeps track of what slide we are on
             let scrapedDataLength = Object.keys(scraped_data).length;
-            if (current_slide == scrapedDataLength - 1)
-                current_slide = current_slide;
-
-            else
+            if (current_slide != scrapedDataLength - 1) {
                 current_slide++;
-
-            // Gets the imgs and texts tags
-            let images = document.querySelectorAll('.main-img');
-            let texts = document.querySelectorAll('.main-text');
-
-            // Sets an index to loop over the selected tags
-            let index = 0;
-            let key_index = "route" + current_slide;
-            
-            for (let [key, value] of Object.entries(scraped_data[`${key_index}`])) {
-                // Changes the src and alt value of the img tags
-                let img = images[index];
-                img.src = value;
-                img.alt = key;
-
-                // Changes the text to match the scraped data
-                texts[index].innerHTML = key;
-                index++;
+                // Function call to change img attribute
+                let key_index = "route" + current_slide;
+                changesImgAtributes(key_index);
             }
         });
 
+        // Moves carousel to the left
         document.getElementById('circle-btn-left').addEventListener('click', () => {
-            // Keeps track of what slide we are on
-            if (current_slide == 0)
-                current_slide = current_slide;
-
-            else
+            if (current_slide != 0) {   
                 current_slide--;
+                // Function call to change img attribute
+                let key_index = "route" + current_slide;
+                changesImgAtributes(key_index);
+            }
+        });
 
+        // Changes the img attributes in the image divs
+        function changesImgAtributes(key_value) {
             // Gets the imgs and texts tags
             let images = document.querySelectorAll('.main-img');
             let texts = document.querySelectorAll('.main-text');
-            let scrapedDataLength = Object.keys(scraped_data).length;
 
             // Sets an index to loop over the selected tags
             let index = 0;
@@ -309,25 +305,24 @@
                 texts[index].innerHTML = key;
                 index++;
             }
-        });
+        }
 
         // Shows suggestions for the star1 input field
-        const star1 = document.getElementById('star1');
-        document.getElementById('star1').addEventListener('keyup', () => {
+        star1.addEventListener('keyup', () => {
             showHint(star1.value, star1);
         });
 
         // Shows suggestions for the star2 input field
-        const star2 = document.getElementById('star2');
-        document.getElementById('star2').addEventListener('keyup', () => {
+        star2.addEventListener('keyup', () => {
             showHint(star2.value, star2);
         });
 
-        // Makes a server request to get name suggestions
+        // Makes a server request to get input suggestions
         function showHint(str, elementName) {
+            let txtHint = document.getElementById("txtHint");
             str = str.trim();
             if (str.length == 0) {
-                document.getElementById("txtHint").innerHTML = "";
+                txtHint.innerHTML = "";
                 return;
             }
 
@@ -336,15 +331,14 @@
 
             request.onload = () => {
                 const data = JSON.parse(request.responseText); // Extracts the JSON data
-                console.log(data);
                 
                 let suggestions = '';
                 for (let [key, value] of Object.entries(data)) {
                     suggestions += value + ', ';
                 }
-                document.getElementById('txtHint').innerHTML = suggestions;
+                txtHint.innerHTML = suggestions;
             }
-
+            // Sends data to server
             const data = new FormData();
             data.append('input', str);
 
@@ -352,7 +346,6 @@
             request.send(data);
             return false;
         }
-
 
     </script>
 {% endblock %}
