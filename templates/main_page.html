@@ -113,11 +113,18 @@
             display: flex;
             flex-direction: column;
             padding: 10px 0;
-            border: 1px solid black;
+        }
+
+        #multiple-stars {
+            display: none;
         }
 
         #first label, #first input, #second label, #second input {
             padding: 10px 10px;
+        }
+        
+        #multiple-stars h5 {
+            margin: 30px 0 0 0;
         }
     </style>
 
@@ -193,9 +200,9 @@
 
     <div id="message" class="alert alert-danger"></div>
 
-    <div class="container">
-        <div class="multiple-stars">
-            <div id="msg" class="alert alert-info"></div>
+    <div class="container" id="multiple-stars">
+        <div>
+            <div id="msg" class="alert alert-info m-5"></div>
 
             <h5>First star: <span id="first-star"></span></h5>
             <div id="first"></div>
@@ -288,62 +295,44 @@
                 // Checks there were multiple stars with the same name
                 let first = document.querySelector('#first');
                 let second = document.querySelector('#second');
+                
+                // Removes the previous input and label elements
+                first.querySelectorAll('div').forEach(removeAllChildNodes);
+                second.querySelectorAll('div').forEach(removeAllChildNodes);
+
+                document.querySelector('#first-star').innerHTML = star1_vlaue;
+                document.querySelector('#second-star').innerHTML = star2_value;
+
                 let msg = document.querySelector('#msg');
                 if (data.status == 'both') {
                     msg.innerHTML = 'Both stars have multiples people with thesame name. Please select one of each.';
                     let first_star = data.first_star;
-                    let index = 0;
-                    for (let [key, value] of Object.entries(first_star)) {
-                        let input = document.createElement('input');
-                        let input_id = `first-star-${index}`;
-                        input.setAttribute('name', 'first_star_id');
-                        input.setAttribute('type', 'radio');
-                        input.setAttribute('value', value.person_id);
-                        input.setAttribute('id', input_id);
-                        // input.setAttribute('class', 'form-control mb-2 mr-sm-2');
-
-                        let label = document.createElement('label');
-                        label.setAttribute('class', 'mb-2 mr-sm-2');
-                        let labelText = `Name: ${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
-                        label.innerHTML = labelText;
-                        label.htmlFor = input_id;
-                        let div_elem = document.createElement('div');
-                        div_elem.appendChild(input);
-                        div_elem.appendChild(label);
-                        first.appendChild(div_elem);
-                        index++;
-                    }
+                    queryForStarId(first_star, 'first', first);
 
                     let second_star = data.second_star;
-                    index = 0;
-                    for (let [key, value] of Object.entries(second_star)) {
-                        let input = document.createElement('input');
-                        let input_id = `second-star-${index}`;
-                        input.setAttribute('name', 'second_star_id');
-                        input.setAttribute('type', 'radio');
-                        input.setAttribute('value', value.person_id);
-                        input.setAttribute('id', input_id);
-
-                        let label = document.createElement('label');
-                        // label.setAttribute('class', 'form-check-label');
-                        let labelText = `${value.name} | ${value.person_id} | ${value.birth}`;
-                        label.innerHTML = labelText;
-                        label.htmlFor = input_id;
-                        let div_elem = document.createElement('div');
-                        div_elem.appendChild(input);
-                        div_elem.appendChild(label);
-                        second.appendChild(div_elem);
-                        index++;
-                    }
+                    queryForStarId(second_star, 'second', second);
+                    document.querySelector('#multiple-stars').style.display = 'grid';
                     return;
                 }
 
                 else if (data.status == 'has_multiple_first') {
+                    msg.innerHTML = 'First star has multiples people with thesame name. Please select one.';
+                    let first_star = data.first_star;
+                    queryForStarId(first_star, 'first', first);
 
+                    second.innerHTML = `Second star's ID: ${scraped_data.second_star}`;
+                    document.querySelector('#multiple-stars').style.display = 'grid';
+                    return;
                 }
 
                 else {
+                    msg.innerHTML = 'Second star has multiples people with thesame name. Please select one.';
+                    let second_star = data.second_star;
+                    queryForStarId(second_star, 'second', second);
 
+                    first.innerHTML = `First star's ID: ${scraped_data.first_star}`;
+                    document.querySelector('#multiple-stars').style.display = 'grid';
+                    return;
                 }
 
                 // Checks whether there was a problem
@@ -416,7 +405,7 @@
         }
 
         // Incase there are more than one star with thesame name
-        function askForStarId(star_data, star_position, parent) {
+        function queryForStarId(star_data, star_position, parent) {
             let index = 0;
             for (let [key, value] of Object.entries(star_data)) {
                 // Creates input element
@@ -431,7 +420,7 @@
                 // Creates label element
                 let label = document.createElement('label');
                 label.setAttribute('class', 'mb-2 mr-sm-2');
-                let labelText = `Name: ${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
+                let labelText = `${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
                 label.innerHTML = labelText;
                 label.htmlFor = input_id;
 
@@ -453,6 +442,11 @@
                 let key_index = "route" + current_slide;
                 changesImgAtributes(key_index);
             }
+        });
+
+        // When the button on the multiple star page is clicked
+        document.querySelector('.by-star-id-btn').addEventListener('click', () => {
+
         });
 
         // Moves carousel to the left
