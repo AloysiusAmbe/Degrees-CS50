@@ -179,9 +179,9 @@
         <div id="show-after-load">
             <div class="form-inline">
                 <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="vin diesel">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="chris evans">
                 <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="donnie yen">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="kevin hart">
                 <div class="form-check-label">
                     <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
                 </div>
@@ -352,6 +352,7 @@
                     message.style.display = 'flex';
 
                     main_content.style.display = 'flex';
+                    main_content.style.flexDirection = 'column';
                     return;
                 }
 
@@ -404,6 +405,8 @@
             data.append('star1', star1_vlaue);
             data.append('star2', star2_value);
             data.append('speed_option', speed_option);
+            let query_by_name = 'true';
+            data.append('by_star_name', query_by_name);
 
             // Send request
             request.send(data)
@@ -424,11 +427,14 @@
                 // Creates input element
                 let input = document.createElement('input');
                 let input_id = `${star_position}-star-${index}`;
-                input.setAttribute('name', `${star_position}_star_id`);
+                input.setAttribute('name', `${star_position}-star-id`);
                 input.setAttribute('type', 'radio');
                 input.setAttribute('value', value.person_id);
                 input.setAttribute('id', input_id);
-                // input.setAttribute('class', 'form-control mb-2 mr-sm-2');
+
+                if (value.birth != '') {
+                    input.checked = true;
+                }
 
                 // Creates label element
                 let label = document.createElement('label');
@@ -446,6 +452,97 @@
             }
         }
 
+        // When the button on the multiple star page is clicked
+        document.querySelector('.by-star-id-btn').addEventListener('click', () => {
+            // Gets the stars selected by the user
+            const star1_id = document.querySelector('input[name=first-star-id]:checked').value;
+            const star2_id = document.querySelector('input[name=second-star-id]:checked').value;
+
+            // Gets the chosen speed by the user
+            let speed_option = document.querySelector('input[name=option]:checked').value;
+            speed_option = speed_option.toLowerCase();
+
+            // Getting needed elements
+            const clackers = document.getElementById('clackers');
+            const main_content = document.getElementById('main');
+            const main_images = document.getElementById('images');
+            const fast_div = document.querySelector('#fast');
+            let degrees = document.querySelector('#degree');
+            let message = document.getElementById('message');
+
+            // Displays the loading screen and hides other elements
+            main_content.style.display = 'none';
+            main_images.style.display = 'none';
+            fast_div.style.display = 'none';
+            clackers.style.display = 'block';
+            message.style.display = 'none';
+            degrees.style.display = 'none';
+
+            // Server request
+            const request = new XMLHttpRequest();
+            request.open('POST', '/connection');
+
+            request.onload = () => {
+                var data = JSON.parse(request.responseText);
+                scraped_data = data;
+                clackers.style.display = 'none';
+
+                // If the user wants the connection to
+                // be displayed fast and without images
+                if (speed_option == 'fast') {
+                    removeAllChildNodes(fast_div);
+                    for (let [key, value] of Object.entries(data)) {
+                        let text_div = document.createElement('div');
+                        text_div.className = 'text-div';
+                        let index = 0;
+                        for (let [key, val] of Object.entries(value)) {
+                            let div = document.createElement('div');
+                            let h5 = document.createElement('h5');
+                            if (index == 0) {
+                                h5.innerHTML = `${val} stars in `;
+                            }
+                            if (index == 1) {
+                                h5.innerHTML = `"${val}" with `;
+                            }
+                            if (index == 2) {
+                                h5.innerHTML = `${val}.`;
+                            }
+
+                            div.appendChild(h5);
+                            text_div.appendChild(div);
+                            index++;
+                        }
+                        fast_div.appendChild(text_div);
+                    }
+                    fast_div.style.display = 'flex';
+                }
+
+                // Images displayes
+                else {
+                    changesImgAtributes('route0');
+                    main_images.style.display = 'flex';
+                }
+
+                main_content.style.display = 'flex';
+                main_content.style.height = 'auto';
+                degrees.style.display = 'flex';
+                document.getElementById('dont-show').style.display = 'none';
+                document.getElementById('show-after-load').style.height = '15vh';
+                degrees.innerHTML = `${Object.keys(data).length} degrees of separation.`;
+                document.querySelector('#multiple-stars').style.display = 'none';
+            }
+
+            const data = new FormData();
+            data.append('star1_id', star1_id);
+            data.append('star2_id', star2_id);
+            data.append('speed_option', speed_option);
+            let query_by_name = 'false';
+            data.append('by_star_name', query_by_name);
+
+            request.send(data);
+            return false;
+        });
+
         // Moves carousel to the right
         document.getElementById('circle-btn-right').addEventListener('click', () => {
             let scrapedDataLength = Object.keys(scraped_data).length;
@@ -455,11 +552,6 @@
                 let key_index = "route" + current_slide;
                 changesImgAtributes(key_index);
             }
-        });
-
-        // When the button on the multiple star page is clicked
-        document.querySelector('.by-star-id-btn').addEventListener('click', () => {
-
         });
 
         // Moves carousel to the left
