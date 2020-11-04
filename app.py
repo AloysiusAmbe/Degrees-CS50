@@ -54,19 +54,19 @@ def find_connection():
             combined_dict['status'] = 'both'
             combined_dict['first_star'] = start_id
             combined_dict['second_star'] = end_id
-            return combined_dict
+            return jsonify(combined_dict)
 
-        elif type(start_id) == dict:
+        if type(start_id) == dict:
             combined_dict['status'] = 'has_multiple_first'
             combined_dict['first_star'] = start_id
             combined_dict['second_star'] = end_id
-            return combined_dict
+            return jsonify(combined_dict)
 
-        else:
+        if type(end_id) == dict:
             combined_dict['status'] = 'has_multiple_second'
             combined_dict['first_star'] = start_id
             combined_dict['second_star'] = end_id
-            return combined_dict
+            return jsonify(combined_dict)
 
         # Calls function to find the connection between the two actors
         path = connections.find_connection(start_id, end_id)
@@ -131,9 +131,9 @@ def get_google_images(search_query, driver, search_filter):
 
     # Making the search url
     if search_filter == 'movie':
-        url = f'https://www.google.com/search?q={query}+movie+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+        url = f'https://www.google.com/search?q={query}+movie&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     else:
-        url = f'https://www.google.com/search?q={query}+actor&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+        url = f'https://www.google.com/search?q={query}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     driver.get(url)
 
     # Scraping the images
