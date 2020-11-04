@@ -21,16 +21,27 @@ def find_connection():
     if request.method == 'GET':
         return redirect(url_for('index'))
 
-    # Post request
+    # Post requesthns
     else:
-        # Getting start and endpoints
-        star1 = request.form.get('star1')
-        star2 = request.form.get('star2')
+        # Getting front-end data
+        query_by_star_name = request.form.get('by_star_name')
         speed_option = request.form.get('speed_option')
 
         # Gets the start and end ids for the inputed stars
-        start_id = connections.get_person_id(star1)
-        end_id = connections.get_person_id(star2)
+        if query_by_star_name == 'false':
+            start_id = request.form.get('star1_id')
+            end_id = request.form.get('star2_id')
+
+        else:
+            star1 = request.form.get('star1')
+            star2 = request.form.get('star2')
+            start_id = connections.get_person_id(star1)
+            end_id = connections.get_person_id(star2)
+
+        print(start_id)
+        print(end_id)
+        print(speed_option)
+        print(query_by_star_name)
 
         # Checks if no star exist for the inputted name
         if start_id == None:
