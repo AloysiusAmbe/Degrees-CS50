@@ -32,6 +32,7 @@ def find_connection():
         start_id = connections.get_person_id(star1)
         end_id = connections.get_person_id(star2)
 
+        # Checks if no star exist for the inputted name
         if start_id == None:
             error = {
                 'success': False,
@@ -45,6 +46,27 @@ def find_connection():
                 'message': f'"{star2}" is not in our dataset'
             }
             return jsonify(error)
+
+        # Checks if there are more than one star with the same name
+        # then asks the user to enter the id to be specific
+        combined_dict = dict()
+        if type(start_id) == dict and type(end_id) == dict:
+            combined_dict['status'] = 'both'
+            combined_dict['first_star'] = start_id
+            combined_dict['second_star'] = end_id
+            return combined_dict
+
+        elif type(start_id) == dict:
+            combined_dict['status'] = 'has_multiple_first'
+            combined_dict['first_star'] = start_id
+            combined_dict['second_star'] = end_id
+            return combined_dict
+
+        else:
+            combined_dict['status'] = 'has_multiple_second'
+            combined_dict['first_star'] = start_id
+            combined_dict['second_star'] = end_id
+            return combined_dict
 
         # Calls function to find the connection between the two actors
         path = connections.find_connection(start_id, end_id)
