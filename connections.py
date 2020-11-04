@@ -151,19 +151,20 @@ def get_person_id(name: str):
     if len(person_ids) == 0:
         return None
     elif len(person_ids) > 1:
-        print(f"Which '{name}'?")
+        person_ids_dict = dict()
+        counter = 0
         for person_id in person_ids:
             person = people[person_id]
             name = person["name"]
             birth = person["birth"]
-            print(f"ID: {person_id}, Name: {name}, Birth: {birth}")
-        try:
-            person_id = input("Intended Person ID: ")
-            if person_id in person_ids:
-                return person_id
-        except ValueError:
-            pass
-        return None
+
+            person_ids_dict[counter] = {
+                'name': name,
+                'person_id': person_id,
+                'birth': birth
+            }
+            counter += 1
+        return person_ids_dict
     else:
         return person_ids[0]
 
