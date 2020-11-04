@@ -3,18 +3,7 @@
 
 {% block body %}
     <style>
-        #main {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100vh;
-            transition: 0.2s ease-in;
-        }
-
         #main h1 {
-            align-self: flex-start;
             margin: 40px 40px 40px 0;
         }
 
@@ -116,8 +105,19 @@
             font-size: 20px;
         }
 
-        input {
+        #images input {
             z-index: 100000;
+        }
+
+        #first, #second {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            border: 1px solid black;
+        }
+
+        #first label, #first input, #second label, #second input {
+            padding: 10px 10px;
         }
     </style>
 
@@ -150,50 +150,62 @@
         <div id="fast"></div>
     </div>
 
-    <div class="container-fluid" id="main">
-        <div class="container">
-            <div id="dont-show">
-                <h1>SIX DEGREES OF BACON</h1>
-                <p>
-                    Six Degree of bacon is a game which connect any one in Hollywood
-                    to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
-                    Star which you want to start at and another star you wish to connect
-                    to.
-                </p>
+    <div class="container" id="main">
+        <div id="dont-show">
+            <h1>SIX DEGREES OF BACON</h1>
+            <p>
+                Six Degree of bacon is a game which connect any one in Hollywood
+                to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
+                Star which you want to start at and another star you wish to connect
+                to.
+            </p>
+        </div>
+        <div id="show-after-load">
+            <div class="form-inline">
+                <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="jerry">
+                <label for="star2" class="mb-2 mr-sm-2">To: </label>
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="kevin hart">
+                <div class="form-check-label">
+                    <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
+                </div>
+                <div class="form-check-inline m-4">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="option" checked="checked" value="Fast">Fast
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="option" value="slow">Slow W/ Images
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="option" value="wiki">Slow W/ wiki images
+                    </label>
+                </div>
             </div>
-            <div id="show-after-load">
-                <div class="form-inline">
-                    <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                    <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="vin diesel">
-                    <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                    <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="donnie yen">
-                    <div class="form-check-label">
-                        <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
-                    </div>
-                    <div class="form-check-inline m-4">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="option" checked="checked" value="Fast">Fast
-                        </label>
-                      </div>
-                      <div class="form-check-inline">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="option" value="slow">Slow W/ Images
-                        </label>
-                      </div>
-                      <div class="form-check-inline">
-                        <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="option" value="wiki">Slow W/ wiki images
-                        </label>
-                    </div>
-                </div>
-                <div id="suggestions">
-                    <p>Suggestions: <span id="txtHint"></span></p>
-                </div>
+            <div id="suggestions">
+                <p>Suggestions: <span id="txtHint"></span></p>
             </div>
         </div>
     </div>
 
     <div id="message" class="alert alert-danger"></div>
+
+    <div class="container">
+        <div class="multiple-stars">
+            <div id="msg" class="alert alert-info"></div>
+
+            <h5>First star: <span id="first-star"></span></h5>
+            <div id="first"></div>
+
+            <h5>Second star: <span id="second-star"></span></h5>
+            <div id="second"></div>
+
+            <button type="submit" class="btn btn-success mb-2 by-star-id-btn" id="button">Submit</button>
+        </div>
+    </div>
 
     <svg width="300" height="120" id="clackers">
         <!-- Left arc path -->
@@ -245,7 +257,6 @@
             let speed_option = document.querySelector('input[name=option]:checked').value;
             speed_option = speed_option.toLowerCase();
 
-            console.log(speed_option);
             // Gets the inputted values
             const star1_vlaue = star1.value;
             const star2_value = star2.value;
@@ -273,6 +284,67 @@
                 var data = JSON.parse(request.responseText); // Extracts the JSON data
                 scraped_data = data;
                 clackers.style.display = 'none';
+
+                // Checks there were multiple stars with the same name
+                let first = document.querySelector('#first');
+                let second = document.querySelector('#second');
+                let msg = document.querySelector('#msg');
+                if (data.status == 'both') {
+                    msg.innerHTML = 'Both stars have multiples people with thesame name. Please select one of each.';
+                    let first_star = data.first_star;
+                    let index = 0;
+                    for (let [key, value] of Object.entries(first_star)) {
+                        let input = document.createElement('input');
+                        let input_id = `first-star-${index}`;
+                        input.setAttribute('name', 'first_star_id');
+                        input.setAttribute('type', 'radio');
+                        input.setAttribute('value', value.person_id);
+                        input.setAttribute('id', input_id);
+                        // input.setAttribute('class', 'form-control mb-2 mr-sm-2');
+
+                        let label = document.createElement('label');
+                        label.setAttribute('class', 'mb-2 mr-sm-2');
+                        let labelText = `Name: ${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
+                        label.innerHTML = labelText;
+                        label.htmlFor = input_id;
+                        let div_elem = document.createElement('div');
+                        div_elem.appendChild(input);
+                        div_elem.appendChild(label);
+                        first.appendChild(div_elem);
+                        index++;
+                    }
+
+                    let second_star = data.second_star;
+                    index = 0;
+                    for (let [key, value] of Object.entries(second_star)) {
+                        let input = document.createElement('input');
+                        let input_id = `second-star-${index}`;
+                        input.setAttribute('name', 'second_star_id');
+                        input.setAttribute('type', 'radio');
+                        input.setAttribute('value', value.person_id);
+                        input.setAttribute('id', input_id);
+
+                        let label = document.createElement('label');
+                        // label.setAttribute('class', 'form-check-label');
+                        let labelText = `${value.name} | ${value.person_id} | ${value.birth}`;
+                        label.innerHTML = labelText;
+                        label.htmlFor = input_id;
+                        let div_elem = document.createElement('div');
+                        div_elem.appendChild(input);
+                        div_elem.appendChild(label);
+                        second.appendChild(div_elem);
+                        index++;
+                    }
+                    return;
+                }
+
+                else if (data.status == 'has_multiple_first') {
+
+                }
+
+                else {
+
+                }
 
                 // Checks whether there was a problem
                 if (data.success == false) {
@@ -313,11 +385,9 @@
                     fast_div.style.display = 'flex';
                 }
 
+                // Images displayes
                 else {
-                    // Function call to change img attribute
                     changesImgAtributes('route0');
-
-                    // Makes the images div visible
                     main_images.style.display = 'flex';
                 }
 
@@ -345,6 +415,35 @@
             }
         }
 
+        // Incase there are more than one star with thesame name
+        function askForStarId(star_data, star_position, parent) {
+            let index = 0;
+            for (let [key, value] of Object.entries(star_data)) {
+                // Creates input element
+                let input = document.createElement('input');
+                let input_id = `${star_position}-star-${index}`;
+                input.setAttribute('name', `${star_position}_star_id`);
+                input.setAttribute('type', 'radio');
+                input.setAttribute('value', value.person_id);
+                input.setAttribute('id', input_id);
+                // input.setAttribute('class', 'form-control mb-2 mr-sm-2');
+
+                // Creates label element
+                let label = document.createElement('label');
+                label.setAttribute('class', 'mb-2 mr-sm-2');
+                let labelText = `Name: ${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
+                label.innerHTML = labelText;
+                label.htmlFor = input_id;
+
+                // Putting the label and input into the DOM
+                let div_elem = document.createElement('div');
+                div_elem.appendChild(input);
+                div_elem.appendChild(label);
+                parent.appendChild(div_elem);
+                index++;
+            }
+        }
+
         // Moves carousel to the right
         document.getElementById('circle-btn-right').addEventListener('click', () => {
             let scrapedDataLength = Object.keys(scraped_data).length;
@@ -367,14 +466,14 @@
         });
 
         // Changes the img attributes in the image divs
-        function changesImgAtributes(key_value) {
+        function changesImgAtributes(key_index) {
             // Gets the imgs and texts tags
             let images = document.querySelectorAll('.main-img');
             let texts = document.querySelectorAll('.main-text');
 
             // Sets an index to loop over the selected tags
             let index = 0;
-            let key_index = "route" + current_slide;
+            // let key_index = "route" + current_slide;
             
             for (let [key, value] of Object.entries(scraped_data[`${key_index}`])) {
                 // Changes the src and alt value of the img tags
