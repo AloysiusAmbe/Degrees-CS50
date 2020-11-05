@@ -1,0 +1,148 @@
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1e90ff;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+#main h1 {
+    margin: 40px 40px 40px 0;
+}
+
+/* Loader screen */
+svg {
+    position: absolute;
+}
+
+circle:nth-of-type(1) { fill: #ffffff; }
+circle:nth-of-type(2) { fill: #fcd837; }
+circle:nth-of-type(3) { fill: #f9a11f; }
+circle:nth-of-type(4) { fill: #f27c21; }
+
+#clackers {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+/* Loader screen end */
+
+#fast {
+    display: none;
+    flex-direction: column;
+}
+
+#fast .text-div {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#fast .text-div div {
+    margin: 20px 0 20px 0;
+    padding: 0 5px 0 5px;
+}
+
+/* Scraped images */
+#images {
+    display: none;
+    width: 100vw;
+    height: 85vh;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+}
+
+.image {
+    width: 320px;
+    height: 480px;
+    margin: 8px;
+    border: 2px solid #fff;
+    border-radius: 16px;
+    position: relative;
+    transition: ease-in 0.2s;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+    border: none;
+    transition: 0.2s;
+}
+
+.image .text {
+    background-color: #ffffff;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    color: #000000;
+    padding: 16px;
+    border-radius: 0 0 16px 16px;
+    text-align: center;
+}
+
+#images .circle-btn {
+    display: block;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 1px solid #fefefe;
+    margin-top: 24px;
+    font-size:22px;
+}
+/* scraped images end */
+
+#message {
+    position: absolute;
+    transform: translate(-50%, -5%);
+    display: none;
+    left: 50%;
+    top: 5%;
+    font-size: 20px;
+}
+
+#images input {
+    z-index: 100000;
+}
+
+#first, #second {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+#multiple-stars {
+    display: none;
+}
+
+#first label, #first input, #second label, #second input {
+    padding: 10px 10px;
+}
+
+#multiple-stars h5 {
+    margin: 30px 0 0 0;
+}
+
+#degree {
+    display: none;
+    width: 50%;
+    justify-content: center;
+    margin: auto;
+}
