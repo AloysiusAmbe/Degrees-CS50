@@ -9,11 +9,19 @@ import connections
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
-connections.load_data('large') # Select to load 'large' or 'small' data
+connections.load_data('large')
 
 @app.route("/")
 def index():
     return render_template("main_page.html")
+
+# Loads data into memory
+@app.route("/load_data", methods=["POST", "GET"])
+def load_data():
+    if request.method == 'POST':
+        connections.load_data('large')
+    return redirect(url_for('index'))
+
 
 @app.route("/connection", methods=["POST", "GET"])
 def find_connection():
@@ -37,11 +45,6 @@ def find_connection():
             star2 = request.form.get('star2')
             start_id = connections.get_person_id(star1)
             end_id = connections.get_person_id(star2)
-
-        print(start_id)
-        print(end_id)
-        print(speed_option)
-        print(query_by_star_name)
 
         # Checks if no star exist for the inputted name
         if start_id == None:
