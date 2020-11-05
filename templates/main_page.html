@@ -2,141 +2,11 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <style>
-        #main h1 {
-            margin: 40px 40px 40px 0;
-        }
-
-        svg {
-            position: absolute;
-        }
-
-        circle:nth-of-type(1) { fill: #ffffff; }
-        circle:nth-of-type(2) { fill: #fcd837; }
-        circle:nth-of-type(3) { fill: #f9a11f; }
-        circle:nth-of-type(4) { fill: #f27c21; }
-
-        #clackers {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        #fast {
-            display: none;
-            flex-direction: column;
-        }
-
-        #fast .text-div {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        #fast .text-div div {
-            margin: 20px 0 20px 0;
-            padding: 0 5px 0 5px;
-        }
-
-        #images {
-            display: none;
-            width: 100vw;
-            height: 85vh;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            overflow-x: hidden;
-        }
-
-        .image {
-            width: 320px;
-            height: 480px;
-            margin: 8px;
-            border: 2px solid #fff;
-            border-radius: 16px;
-            position: relative;
-            transition: ease-in 0.2s;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-
-        .image img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 16px;
-            object-fit: cover;
-            border: none;
-            transition: 0.2s;
-        }
-
-        .image .text {
-            background-color: #ffffff;
-            position: absolute;
-            bottom: 0px;
-            left: 0;
-            right: 0;
-            z-index: 2;
-            color: #000000;
-            padding: 16px;
-            border-radius: 0 0 16px 16px;
-            text-align: center;
-        }
-
-        #images .circle-btn {
-            display: block;
-            height: 50px;
-            width: 50px;
-            border-radius: 50%;
-            border: 1px solid #fefefe;
-            margin-top: 24px;
-            font-size:22px;
-        }
-
-        #message {
-            position: absolute;
-            transform: translate(-50%, -5%);
-            display: none;
-            left: 50%;
-            top: 5%;
-            font-size: 20px;
-        }
-
-        #images input {
-            z-index: 100000;
-        }
-
-        #first, #second {
-            display: flex;
-            flex-direction: column;
-            padding: 10px 0;
-        }
-
-        #multiple-stars {
-            display: none;
-        }
-
-        #first label, #first input, #second label, #second input {
-            padding: 10px 10px;
-        }
-        
-        #multiple-stars h5 {
-            margin: 30px 0 0 0;
-        }
-
-        #degree {
-            display: none;
-            width: 50%;
-            justify-content: center;
-            margin: auto;
-        }
-    </style>
-
+    <!-- Says the degree of seperation between the two actors -->
     <div id="degree" class="alert alert-success mt-5"></div>
 
+
+    <!-- Displays the scraped images -->
     <div class="container-fluid">
         <div id="images">
             <input class="circle-btn btn-success" id="circle-btn-left" type="submit" value="<">
@@ -164,24 +34,26 @@
         </div>
 
         <div id="fast"></div>
-    </div>
+    </div> 
 
+
+    <!-- Main Page - tells what the program is about -->
     <div class="container" id="main">
         <div id="dont-show">
             <h1>SIX DEGREES OF BACON</h1>
             <p>
-                Six Degree of bacon is a game which connect any one in Hollywood
+                Six Degree of bacon is a game which connects anyone in Hollywood
                 to Kevin Bacon in 6 steps or less. Enter the name of any Hollywood
-                Star which you want to start at and another star you wish to connect
+                actor you wish to start at and another star you wish to connect
                 to.
             </p>
         </div>
         <div id="show-after-load">
             <div class="form-inline">
                 <label for="star1" class="mb-2 mr-sm-2">Connect :</label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="chris evans">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star1" name="star1" value="donnie yen">
                 <label for="star2" class="mb-2 mr-sm-2">To: </label>
-                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="kevin hart">
+                <input type="text" class="form-control mb-2 mr-sm-2" autocomplete="off" id="star2" name="star2" value="vin diesel">
                 <div class="form-check-label">
                     <button type="submit" class="btn btn-success mb-2" id="button">Submit</button>
                 </div>
@@ -206,9 +78,15 @@
             </div>
         </div>
     </div>
+    <!-- Main page end -->
 
+
+    <!-- Tells the user that the inputed star does not exist -->
     <div id="message" class="alert alert-danger"></div>
 
+
+    <!-- Displays radio boxes for the user to select
+    one star of there were multiple stars eith the same name -->
     <div class="container" id="multiple-stars">
         <div>
             <div id="msg" class="alert alert-info m-5"></div>
@@ -223,6 +101,8 @@
         </div>
     </div>
 
+
+    <!-- Loading page -->
     <svg width="300" height="120" id="clackers">
         <!-- Left arc path -->
         <svg>
@@ -238,7 +118,6 @@
         L O A D I N G
         </text>
         <circle cx="15" cy="15" r="15">
-        <!-- I used a python script to calculate the keyPoints and keyTimes based on a quadratic function. -->
         <animateMotion dur="1.5s" repeatCount="indefinite"
             calcMode="linear"
             keyPoints="0.0;0.19;0.36;0.51;0.64;0.75;0.84;0.91;0.96;0.99;1.0;0.99;0.96;0.91;0.84;0.75;0.64;0.51;0.36;0.19;0.0;0.0;0.05;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0"
@@ -257,374 +136,7 @@
         </animateMotion>
         </circle>
     </svg>
+    <!-- Loading page end -->
 
-    <script>
-        // Initializing needed variables
-        var scraped_data;
-        var current_slide = 0;
-        var images = document.getElementById('images'); // Gets images div
-        var star1 = document.getElementById('star1');
-        var star2 = document.getElementById('star2');
-
-        // Displays the loading page and sends the entered data
-        // to the server to get the connection between two actors
-        document.getElementById('button').addEventListener('click', () => {
-            // Gets the chosen speed by the user
-            let speed_option = document.querySelector('input[name=option]:checked').value;
-            speed_option = speed_option.toLowerCase();
-
-            // Gets the inputted values
-            const star1_vlaue = star1.value;
-            const star2_value = star2.value;
-
-            // Getting needed elements
-            const clackers = document.getElementById('clackers');
-            const main_content = document.getElementById('main');
-            const main_images = document.getElementById('images');
-            const fast_div = document.querySelector('#fast');
-            let degrees = document.querySelector('#degree');
-            let message = document.getElementById('message');
-
-            // Displays the loading screen and hides other elements
-            main_content.style.display = 'none';
-            main_images.style.display = 'none';
-            fast_div.style.display = 'none';
-            clackers.style.display = 'block';
-            message.style.display = 'none';
-            degrees.style.display = 'none';
-
-            // Server request
-            const request = new XMLHttpRequest();
-            request.open('POST', '/connection');
-
-            // When request finish loading
-            request.onload = () => {
-                var data = JSON.parse(request.responseText); // Extracts the JSON data
-                scraped_data = data;
-                clackers.style.display = 'none';
-
-                // Checks there were multiple stars with the same name
-                let first = document.querySelector('#first');
-                let second = document.querySelector('#second');
-                
-                // Removes the previous input and label elements
-                first.querySelectorAll('div').forEach(removeAllChildNodes);
-                second.querySelectorAll('div').forEach(removeAllChildNodes);
-
-                document.querySelector('#first-star').innerHTML = star1_vlaue;
-                document.querySelector('#second-star').innerHTML = star2_value;
-
-                let msg = document.querySelector('#msg');
-                if (data.status == 'both') {
-                    msg.innerHTML = 'Both stars have multiples people with thesame name. Please select one of each.';
-                    let first_star = data.first_star;
-                    queryForStarId(first_star, 'first', first);
-
-                    let second_star = data.second_star;
-                    queryForStarId(second_star, 'second', second);
-                    document.querySelector('#multiple-stars').style.display = 'grid';
-                    return;
-                }
-
-                else if (data.status == 'has_multiple_first') {
-                    msg.innerHTML = 'First star has multiples people with thesame name. Please select one.';
-                    let first_star = data.first_star;
-                    queryForStarId(first_star, 'first', first);
-
-                    second.innerHTML = `Second star's ID: ${scraped_data.second_star}`;
-                    document.querySelector('#multiple-stars').style.display = 'grid';
-                    return;
-                }
-
-                else if (data.status == 'has_multiple_second') {
-                    msg.innerHTML = 'Second star has multiples people with thesame name. Please select one.';
-                    let second_star = data.second_star;
-                    queryForStarId(second_star, 'second', second);
-
-                    first.innerHTML = `First star's ID: ${scraped_data.first_star}`;
-                    document.querySelector('#multiple-stars').style.display = 'grid';
-                    return;
-                }
-
-                // Checks whether there was a problem
-                if (data.success == false) {
-                    message.innerHTML = data.message;
-                    message.style.display = 'flex';
-
-                    main_content.style.display = 'flex';
-                    main_content.style.flexDirection = 'column';
-                    return;
-                }
-
-                // If the user wants the connection to
-                // be displayed fast and without images
-                if (speed_option == 'fast') {
-                    removeAllChildNodes(fast_div);
-                    for (let [key, value] of Object.entries(data)) {
-                        let text_div = document.createElement('div');
-                        text_div.className = 'text-div';
-                        let index = 0;
-                        for (let [key, val] of Object.entries(value)) {
-                            let div = document.createElement('div');
-                            let h5 = document.createElement('h5');
-                            if (index == 0) {
-                                h5.innerHTML = `${val} stars in `;
-                            }
-                            if (index == 1) {
-                                h5.innerHTML = `"${val}" with `;
-                            }
-                            if (index == 2) {
-                                h5.innerHTML = `${val}.`;
-                            }
-
-                            div.appendChild(h5);
-                            text_div.appendChild(div);
-                            index++;
-                        }
-                        fast_div.appendChild(text_div);
-                    }
-                    fast_div.style.display = 'flex';
-                }
-
-                // Images displayes
-                else {
-                    changesImgAtributes('route0');
-                    main_images.style.display = 'flex';
-                }
-
-                main_content.style.display = 'flex';
-                main_content.style.height = 'auto';
-                degrees.style.display = 'flex';
-                document.getElementById('dont-show').style.display = 'none';
-                document.getElementById('show-after-load').style.height = '15vh';
-                degrees.innerHTML = `${Object.keys(data).length} degrees of separation.`;
-            }
-
-            // Add data to send with request
-            const data = new FormData();
-            data.append('star1', star1_vlaue);
-            data.append('star2', star2_value);
-            data.append('speed_option', speed_option);
-            let query_by_name = 'true';
-            data.append('by_star_name', query_by_name);
-
-            // Send request
-            request.send(data)
-            return false;
-        });
-
-        // Clears div so results for new query can be put on web page
-        function removeAllChildNodes(parent) {
-            while (parent.firstChild) {
-                parent.removeChild(parent.firstChild);
-            }
-        }
-
-        // Incase there are more than one star with thesame name
-        function queryForStarId(star_data, star_position, parent) {
-            let index = 0;
-            for (let [key, value] of Object.entries(star_data)) {
-                // Creates input element
-                let input = document.createElement('input');
-                let input_id = `${star_position}-star-${index}`;
-                input.setAttribute('name', `${star_position}-star-id`);
-                input.setAttribute('type', 'radio');
-                input.setAttribute('value', value.person_id);
-                input.setAttribute('id', input_id);
-
-                if (value.birth != '') {
-                    input.checked = true;
-                }
-
-                // Creates label element
-                let label = document.createElement('label');
-                label.setAttribute('class', 'mb-2 mr-sm-2');
-                let labelText = `${value.name} | ID: ${value.person_id} | Birth: ${value.birth}`;
-                label.innerHTML = labelText;
-                label.htmlFor = input_id;
-
-                // Putting the label and input into the DOM
-                let div_elem = document.createElement('div');
-                div_elem.appendChild(input);
-                div_elem.appendChild(label);
-                parent.appendChild(div_elem);
-                index++;
-            }
-        }
-
-        // When the button on the multiple star page is clicked
-        document.querySelector('.by-star-id-btn').addEventListener('click', () => {
-            // Gets the stars selected by the user
-            const star1_id = document.querySelector('input[name=first-star-id]:checked').value;
-            const star2_id = document.querySelector('input[name=second-star-id]:checked').value;
-
-            // Gets the chosen speed by the user
-            let speed_option = document.querySelector('input[name=option]:checked').value;
-            speed_option = speed_option.toLowerCase();
-
-            // Getting needed elements
-            const clackers = document.getElementById('clackers');
-            const main_content = document.getElementById('main');
-            const main_images = document.getElementById('images');
-            const fast_div = document.querySelector('#fast');
-            let degrees = document.querySelector('#degree');
-            let message = document.getElementById('message');
-
-            // Displays the loading screen and hides other elements
-            main_content.style.display = 'none';
-            main_images.style.display = 'none';
-            fast_div.style.display = 'none';
-            clackers.style.display = 'block';
-            message.style.display = 'none';
-            degrees.style.display = 'none';
-
-            // Server request
-            const request = new XMLHttpRequest();
-            request.open('POST', '/connection');
-
-            request.onload = () => {
-                var data = JSON.parse(request.responseText);
-                scraped_data = data;
-                clackers.style.display = 'none';
-
-                // If the user wants the connection to
-                // be displayed fast and without images
-                if (speed_option == 'fast') {
-                    removeAllChildNodes(fast_div);
-                    for (let [key, value] of Object.entries(data)) {
-                        let text_div = document.createElement('div');
-                        text_div.className = 'text-div';
-                        let index = 0;
-                        for (let [key, val] of Object.entries(value)) {
-                            let div = document.createElement('div');
-                            let h5 = document.createElement('h5');
-                            if (index == 0) {
-                                h5.innerHTML = `${val} stars in `;
-                            }
-                            if (index == 1) {
-                                h5.innerHTML = `"${val}" with `;
-                            }
-                            if (index == 2) {
-                                h5.innerHTML = `${val}.`;
-                            }
-
-                            div.appendChild(h5);
-                            text_div.appendChild(div);
-                            index++;
-                        }
-                        fast_div.appendChild(text_div);
-                    }
-                    fast_div.style.display = 'flex';
-                }
-
-                // Images displayes
-                else {
-                    changesImgAtributes('route0');
-                    main_images.style.display = 'flex';
-                }
-
-                main_content.style.display = 'flex';
-                main_content.style.height = 'auto';
-                degrees.style.display = 'flex';
-                document.getElementById('dont-show').style.display = 'none';
-                document.getElementById('show-after-load').style.height = '15vh';
-                degrees.innerHTML = `${Object.keys(data).length} degrees of separation.`;
-                document.querySelector('#multiple-stars').style.display = 'none';
-            }
-
-            const data = new FormData();
-            data.append('star1_id', star1_id);
-            data.append('star2_id', star2_id);
-            data.append('speed_option', speed_option);
-            let query_by_name = 'false';
-            data.append('by_star_name', query_by_name);
-
-            request.send(data);
-            return false;
-        });
-
-        // Moves carousel to the right
-        document.getElementById('circle-btn-right').addEventListener('click', () => {
-            let scrapedDataLength = Object.keys(scraped_data).length;
-            if (current_slide != scrapedDataLength - 1) {
-                current_slide++;
-                // Function call to change img attribute
-                let key_index = "route" + current_slide;
-                changesImgAtributes(key_index);
-            }
-        });
-
-        // Moves carousel to the left
-        document.getElementById('circle-btn-left').addEventListener('click', () => {
-            if (current_slide != 0) {   
-                current_slide--;
-                // Function call to change img attribute
-                let key_index = "route" + current_slide;
-                changesImgAtributes(key_index);
-            }
-        });
-
-        // Changes the img attributes in the image divs
-        function changesImgAtributes(key_index) {
-            // Gets the imgs and texts tags
-            let images = document.querySelectorAll('.main-img');
-            let texts = document.querySelectorAll('.main-text');
-
-            // Sets an index to loop over the selected tags
-            let index = 0;
-            // let key_index = "route" + current_slide;
-            
-            for (let [key, value] of Object.entries(scraped_data[`${key_index}`])) {
-                // Changes the src and alt value of the img tags
-                let img = images[index];
-                img.src = value;
-                img.alt = key;
-
-                // Changes the text to match the scraped data
-                texts[index].innerHTML = key;
-                index++;
-            }
-        }
-
-        // Shows suggestions for the star1 input field
-        star1.addEventListener('keyup', () => {
-            showHint(star1.value, star1);
-        });
-
-        // Shows suggestions for the star2 input field
-        star2.addEventListener('keyup', () => {
-            showHint(star2.value, star2);
-        });
-
-        // Makes a server request to get input suggestions
-        function showHint(str, elementName) {
-            let txtHint = document.getElementById("txtHint");
-            str = str.trim();
-            if (str.length == 0) {
-                txtHint.innerHTML = "";
-                return;
-            }
-
-            const request = new XMLHttpRequest;
-            request.open('POST', '/gethint');
-
-            request.onload = () => {
-                const data = JSON.parse(request.responseText); // Extracts the JSON data
-                
-                let suggestions = '';
-                for (let [key, value] of Object.entries(data)) {
-                    suggestions += value + ', ';
-                }
-                txtHint.innerHTML = suggestions;
-            }
-            // Sends data to server
-            const data = new FormData();
-            data.append('input', str);
-
-            // Send request
-            request.send(data);
-            return false;
-        }
-
-    </script>
+    <script src="{{ url_for('static', filename='js/myScript.js') }}"></script>
 {% endblock %}
