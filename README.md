@@ -19,7 +19,7 @@ movies they have acted in. There are two main features in the app:
   
 ### How to run app (Windows)
   - Create a git repository and use
-    - git clone 
+    - git clone https://github.com/AloysiusAmbe/Degrees-CS50.git
   - Use 'pip-install -r requirements.txt' to install all the needed depencies
   - cd into the directory where the source code is downloaded and run
     - set FLASK_APP=app.py
