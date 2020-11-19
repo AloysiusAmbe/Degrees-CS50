@@ -26,7 +26,7 @@ var star1_id = null;
 var star2_id = null;
 
 // Button on main page is clicked
-document.getElementById('button').addEventListener('click', () => {
+$('#button').click(function() {
     let data_to_send = {
         'star1': star1.value,
         'star2': star2.value,
@@ -36,7 +36,7 @@ document.getElementById('button').addEventListener('click', () => {
 });
 
 // When the button on the multiple star page is clicked
-document.querySelector('.by-star-id-btn').addEventListener('click', () => {
+$('#by-star-id-btn').click(function() {
     // Gets the stars selected by the user
     if (star1_id == null)
         star1_id = document.querySelector('input[name=first-star-id]:checked').value;
@@ -52,7 +52,7 @@ document.querySelector('.by-star-id-btn').addEventListener('click', () => {
 
     // Gets the connection between two stars
     getConnectionsFromServer(data_to_send);
-    document.querySelector('#multiple-stars').style.display = 'none';
+    $('#multiple-stars').css('display', 'none');
 
     star1_id = null;
     star2_id = null;
@@ -73,12 +73,12 @@ function getConnectionsFromServer(data_to_send) {
     let message = document.getElementById('message');
 
     // Displays the loading screen and hides other elements
-    main_content.style.display = 'none';
-    main_images.style.display = 'none';
-    fast_div.style.display = 'none';
-    clackers.style.display = 'block';
-    message.style.display = 'none';
-    degrees.style.display = 'none';
+    $('#main').css('display', 'none');
+    $('#images').css('display', 'none');
+    $('#fast').css('display', 'none');
+    $('#clackers').css('display', 'block');
+    $('#message').css('display', 'none');
+    $('#degree').css('display', 'none');
 
     // Server request
     const request = new XMLHttpRequest();
@@ -88,7 +88,7 @@ function getConnectionsFromServer(data_to_send) {
     request.onload = () => {
         var data = JSON.parse(request.responseText); // Extracts the JSON data
         scraped_data = data;
-        clackers.style.display = 'none';
+        $('#clackers').css('display', 'none');
 
         if (data_to_send.by_star_name == 'true') {
             // Removes the previous input and label elements
@@ -97,45 +97,43 @@ function getConnectionsFromServer(data_to_send) {
             first.querySelectorAll('div').forEach(removeAllChildNodes);
             second.querySelectorAll('div').forEach(removeAllChildNodes);
 
-            document.querySelector('#first-star').innerHTML = data_to_send.star1;
-            document.querySelector('#second-star').innerHTML = data_to_send.star2;
+            $('#first-star').text(data_to_send.star1);
+            $('#second-star').text(data_to_send.star2);
 
-            let msg = document.querySelector('#msg');
             if (data.status == 'both') {
-                msg.innerHTML = 'Both stars have multiple people with thesame name. Please select one of each.';
+                $('#msg').text('Both stars have multiple people with thesame name. Please select one of each.');
                 queryForStarId(data.first_star, 'first', first);
 
                 queryForStarId(data.second_star, 'second', second);
-                document.querySelector('#multiple-stars').style.display = 'grid';
+                $('#multiple-stars').css('display', 'grid');
                 return;
             }
 
             else if (data.status == 'has_multiple_first') {
-                msg.innerHTML = 'First star has multiple people with thesame name. Please select one.';
+                $('#msg').text('First star has multiple people with thesame name. Please select one.');
                 queryForStarId(data.first_star, 'first', first);
 
                 second.innerHTML = `Second star's ID: ${data.second_star}`;
                 star2_id = data.second_star;
-                document.querySelector('#multiple-stars').style.display = 'grid';
+                $('#multiple-stars').css('display', 'grid');
                 return;
             }
 
             else if (data.status == 'has_multiple_second') {
-                msg.innerHTML = 'Second star has multiple people with thesame name. Please select one.';
+                $('#msg').text('Second star has multiple people with thesame name. Please select one.');
                 queryForStarId(data.second_star, 'second', second);
 
                 first.innerHTML = `First star's ID: ${data.first_star}`;
                 star1_id = data.first_star;
-                document.querySelector('#multiple-stars').style.display = 'grid';
+                $('#multiple-stars').css('display', 'grid');
                 return;
             }
 
             // Checks whether there was a problem
             if (data.success == false) {
-                message.innerHTML = data.message;
-                message.style.display = 'flex';
-
-                main_content.style.display = 'flex';
+                $('#message').text(data.message);
+                $('#message').css('display', 'flex');
+                $('#main').css('display', 'flex');
                 return;
             }
         }
@@ -175,12 +173,12 @@ function getConnectionsFromServer(data_to_send) {
             main_images.style.display = 'flex';
         }
 
-        main_content.style.display = 'flex';
-        main_content.style.height = 'auto';
-        degrees.style.display = 'flex';
-        document.getElementById('dont-show').style.display = 'none';
-        document.getElementById('show-after-load').style.height = '15vh';
-        degrees.innerHTML = `${Object.keys(data).length} degrees of separation.`;
+        $('#main').css('display', 'flex');
+        $('#main').css('height', 'auto');
+        $('#degree').css('display', 'flex');
+        $('#degree').text(`${Object.keys(data).length} degrees of separation.`);
+        $('#dont-show').css('display', 'none');
+        $('#show-after-load').css('height', 'auto');
     }
 
     // Add data to send with request
@@ -222,7 +220,7 @@ function queryForStarId(star_data, star_position, parent) {
         label.innerHTML = labelText;
         label.htmlFor = input_id;
 
-        // Putting the label and input into the DOM
+        // Putting the label and input in the DOM
         let div_elem = document.createElement('div');
         div_elem.appendChild(input);
         div_elem.appendChild(label);
@@ -232,7 +230,7 @@ function queryForStarId(star_data, star_position, parent) {
 }
 
 // Moves carousel to the right
-document.getElementById('circle-btn-right').addEventListener('click', () => {
+$('#circle-btn-right').click(function() {
     let dataLength = Object.keys(scraped_data).length;
     if (current_slide != dataLength - 1) {
         current_slide++;
@@ -242,7 +240,7 @@ document.getElementById('circle-btn-right').addEventListener('click', () => {
 });
 
 // Moves carousel to the left
-document.getElementById('circle-btn-left').addEventListener('click', () => {
+$('#circle-btn-left').click(function() {
     if (current_slide != 0) {   
         current_slide--;
         // Function call to change img attribute
@@ -250,9 +248,8 @@ document.getElementById('circle-btn-left').addEventListener('click', () => {
     }
 });
 
-// Changes the img attributes in the image divs
+// Changes the img attributes and texts in the image divs
 function changesImgAtributes() {
-    // Gets the imgs and texts tags
     let images = document.querySelectorAll('.main-img');
     let texts = document.querySelectorAll('.main-text');
 

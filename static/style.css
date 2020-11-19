@@ -12,6 +12,10 @@ body {
     overflow-x: hidden;
 }
 
+#main {
+    flex-direction: column;
+}
+
 #main h1 {
     margin: 40px 40px 40px 0;
 }
@@ -145,4 +149,8 @@ circle:nth-of-type(4) { fill: #f27c21; }
     width: 50%;
     justify-content: center;
     margin: auto;
+}
+
+#dont-show {
+    height: auto;
 }
