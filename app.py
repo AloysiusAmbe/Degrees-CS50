@@ -9,7 +9,7 @@ import connections
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
-connections.load_data('large')
+connections.load_data('small')
 
 @app.route("/")
 def index():
