@@ -51,9 +51,7 @@ def main():
     '''
     Main function call
     '''
-    print('Loading data...')
     load_data(path_name='small')
-    print('Data Loaded!\n')
 
     while True:
         path =  find_connection()
@@ -61,8 +59,6 @@ def main():
             return
         
         degrees = len(path)
-        for p in path:
-            print(f'{people[p.star_1_id]["name"]} and {people[p.star_2_id]["name"]} in "{movies[p.movie_id]["title"]}"')
 
 def find_connection(start_id, end_id):
     '''
@@ -80,7 +76,6 @@ def find_connection(start_id, end_id):
     # Checking all the neighbors of the start and adds them to the queue
     for movie_id, star_id in neighbors:
         if star_id == end_id:
-            print('Found')
             # print(f'{people[start_id]["name"]} in "{movies[movie_id]["title"]}" with {people[end_id]["name"]}')
             return [Node(star_1_id=start_id, movie_id=movie_id, star_2_id=star_id)]
 
@@ -106,7 +101,6 @@ def find_connection(start_id, end_id):
         for movie_id, star_id in neighbors:
             # Checks if connection has been found
             if star_id == end_id:
-                print('found')
 
                 # Gets the first connection
                 for start_neighbor_movie_id, start_neighbor_star_id in neighbors_of_start:
@@ -123,7 +117,6 @@ def find_connection(start_id, end_id):
                 queue.push(node=node)
     
     else:
-        print('No connection found!')
         return None
 
 
