@@ -29,3 +29,6 @@ movies they have acted in. There are two main features in the app:
 ### Note
   - It takes a while for the app to load since all the data is being loaded into memory at that time.
   - Scraping the images from google is a slow process and the scraper downloads the url of the first image from google.
+
+### Acknowledgements
+  - All data courtesy of 'Havard's CS50 Introduction to Artificial Intelligence' course on EDx.
