@@ -1,6 +1,6 @@
 import csv
 
-from Node import Node, Stack, Queue
+from util import Node, Stack, Queue
 
 # Maps names to a set of corresponding person_ids
 names = {}
