@@ -253,7 +253,7 @@ function changesImgAtributes() {
     let images = document.querySelectorAll('.main-img');
     let texts = document.querySelectorAll('.main-text');
 
-    // Sets an index to loop over the selected tags
+    // Sets an index to loop over the image and text elements
     let index = 0;
     let key_index = `route${current_slide}`;
 

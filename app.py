@@ -9,7 +9,7 @@ import connections
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
-connections.load_data('small')
+connections.load_data('large')
 
 @app.route("/")
 def index():
@@ -145,7 +145,7 @@ def get_google_images(search_query, driver, search_filter):
 
     # Making the search url
     if search_filter == 'movie':
-        url = f'https://www.google.com/search?q={query}+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+        url = f'https://www.google.com/search?q={query}+movie+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     else:
         url = f'https://www.google.com/search?q={query}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     driver.get(url)
