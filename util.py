@@ -45,3 +45,9 @@ class Queue(Stack):
             raise Exception('Queue is empty')
         else:
             return self.frontier[0]
+
+    def get_path(self):
+        if self.isEmpty():
+            raise Exception('Queue is empty')
+        else:
+            return self.frontier[-1]
