@@ -46,7 +46,7 @@ def find_connection():
             start_id = connections.get_person_id(star1)
             end_id = connections.get_person_id(star2)
 
-        # Checks if no star exist for the inputted name
+        # Checks if no star exists for the inputted name
         if start_id == None:
             error = {
                 'success': False,
@@ -93,12 +93,12 @@ def find_connection():
         # If the user opts to get the connecstion between 2 stars fast
         if speed_option == 'fast':
             connection = dict()
+            connection['start_point'] = connections.people[start_id]["name"]
             counter = 0
-            for p in path:
+            for movie_id, star_id in path:
                 connection[f'route{counter}'] = {
-                    'start': connections.people[p.star_1_id]["name"],
-                    'movie': connections.movies[p.movie_id]["title"],
-                    'end': connections.people[p.star_2_id]["name"]
+                    'movie': connections.movies[movie_id]["title"],
+                    'star': connections.people[star_id]["name"]
                 }
                 counter += 1
             return jsonify(connection)

@@ -51,87 +51,83 @@ def main():
     '''
     Main function call
     '''
-    load_data(path_name='small')
+    load_data('small')
 
-    while True:
-        path =  find_connection()
-        if path == None:
-            return
-        
-        degrees = len(path)
+    path =  find_connection('200', '197')
+    if path == None:
+        return
+    else:
+        print(path)
+    
+    degrees = len(path)
 
 def find_connection(start_id, end_id):
     '''
     Finds and returns the connection between two actors
     '''
 
-    # Keeps track of all the star ids which have been visited
-    visited_ids = set()
-    visited_ids.add(start_id)
+    # Keeps track of all ids which have been visited
+    visited = set()
+    visited.add(start_id)
 
     # Gets all the stars who are in the same movie as the starting actor
-    neighbors = get_neighbors(person_id=start_id)
+    neighbors = get_neighbors(start_id, visited)
     queue = Queue()
+    paths = list()
 
     # Checking all the neighbors of the start and adds them to the queue
     for movie_id, star_id in neighbors:
         if star_id == end_id:
-            # print(f'{people[start_id]["name"]} in "{movies[movie_id]["title"]}" with {people[end_id]["name"]}')
-            return [Node(star_1_id=start_id, movie_id=movie_id, star_2_id=star_id)]
+            return [(movie_id, star_id)]
 
-        if star_id not in visited_ids:
-            node = Node(star_1_id=start_id, movie_id=movie_id, star_2_id=star_id)
-            queue.push(node=node)
-            visited_ids.add(star_id)
+        if star_id not in visited:
+            # Stores each connection between actors
+            node = Node(start_id, movie_id, star_id)
+            queue.push(node)
 
-    neighbors_of_start = neighbors
+            paths.append([(movie_id, star_id)])
 
-    # Loops till queue is empty
-    while(not queue.isEmpty()):
-        path = []
+    while not queue.isEmpty():
         # Get the current node and add it to the visited set
         current_node = queue.pop()
         current_star_id = current_node.star_2_id
-        visited_ids.add(current_star_id)
-        path.append(current_node)
+        visited.add(current_star_id)
 
-        # Gets the neighbors of the current node's second star and adds them to the queue
-        neighbors = get_neighbors(person_id=current_star_id)
+        # Gets rhe current path
+        current_path = paths[0]
+        paths = paths[1:]
+
+        neighbors = get_neighbors(current_star_id, visited)
 
         for movie_id, star_id in neighbors:
+            path = list(current_path)
+            if star_id not in visited:
+                # Adds a star's id to the queue if it has not been visited
+                node = Node(current_node.star_2_id, movie_id, star_id)
+                queue.push(node)
+
+                path.append((movie_id, star_id))
+                paths.append(path)
+
             # Checks if connection has been found
             if star_id == end_id:
-
-                # Gets the first connection
-                for start_neighbor_movie_id, start_neighbor_star_id in neighbors_of_start:
-                    if (start_neighbor_star_id in [p.star_1_id for p in path]) and (start_neighbor_star_id != start_id):
-                        path.insert(0, Node(star_1_id=start_id, movie_id=start_neighbor_movie_id, star_2_id=start_neighbor_star_id))
-                        break
-
-                path.append(Node(star_1_id=current_star_id, movie_id=movie_id, star_2_id=star_id))
                 return path
-
-            # Adds a star's id to the queue only if it has not been visited
-            if star_id not in visited_ids:
-                node = Node(star_1_id=current_node.star_2_id, movie_id=movie_id, star_2_id=star_id)
-                queue.push(node=node)
     
+    # No path
     else:
         return None
 
 
-def get_neighbors(person_id):
+def get_neighbors(person_id, visited: set):
     '''
     Gets all the stars who are in the same movie as the starting actor
     '''
+    neighbors = list()
     movie_ids = people[person_id]['movies']
-    neighbors = set()
     for movie_id in movie_ids:
-        movie = movies[movie_id]['title']
-        stars_in_movie = movies[movie_id]['stars']
-        for star_id in stars_in_movie:
-            # if star_id != person_id:
-            neighbors.add((movie_id, star_id))
+        stars_ids = movies[movie_id]['stars']
+        for star_id in stars_ids:
+            neighbors.append((movie_id, star_id))
     return neighbors
 
 
