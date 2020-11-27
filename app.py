@@ -9,18 +9,11 @@ import connections
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
-connections.load_data('small')
+connections.load_data('large') # Loads data into memory
 
 @app.route("/")
 def index():
     return render_template("main_page.html")
-
-# Loads data into memory
-@app.route("/load_data", methods=["POST", "GET"])
-def load_data():
-    if request.method == 'POST':
-        connections.load_data('large')
-    return redirect(url_for('index'))
 
 
 @app.route("/connection", methods=["POST", "GET"])
@@ -93,14 +86,24 @@ def find_connection():
         # If the user opts to get the connecstion between 2 stars fast
         if speed_option == 'fast':
             connection = dict()
-            connection['start_point'] = connections.people[start_id]["name"]
-            counter = 0
+            key = 0
+            previous_star_id = None
             for movie_id, star_id in path:
-                connection[f'route{counter}'] = {
-                    'movie': connections.movies[movie_id]["title"],
-                    'star': connections.people[star_id]["name"]
-                }
-                counter += 1
+                if key == 0:
+                    connection['route0'] = {
+                        'star1': connections.people[start_id]['name'],
+                        'movie': connections.movies[movie_id]["title"],
+                        'star2': connections.people[star_id]["name"]
+                    }
+                    previous_star_id = star_id
+                else:
+                    connection[f'route{key}'] = {
+                        'star1': connections.people[previous_star_id]['name'],
+                        'movie': connections.movies[movie_id]["title"],
+                        'start': connections.people[star_id]["name"]
+                    }
+                    previous_star_id = star_id
+                key += 1
             return jsonify(connection)
 
         # User chooses to use wikipedia images - fast but image not guarenteed
@@ -114,18 +117,37 @@ def find_connection():
         driver = webdriver.Chrome(PATH, options=options)
 
         scraped_images = dict()
-        key_index = 0
-        for p in path:
-            star1 = connections.people[p.star_1_id]["name"]
-            movie_title = connections.movies[p.movie_id]["title"]
-            star2 = connections.people[p.star_2_id]["name"]
+        key = 0
+        previous_url = None
+        previous_star_name = None
 
-            scraped_images[f'route{key_index}'] = {
-                star1: get_google_images(star1, driver, 'actor'),
-                movie_title: get_google_images(movie_title, driver, 'movie'),
-                star2: get_google_images(star2, driver, 'actor')
-            }
-            key_index += 1
+        for movie_id, star_id in path:
+            # Gets the star's name and name of movie
+            movie = connections.movies[movie_id]["title"]
+            star = connections.people[star_id]["name"]
+
+            # Gets the image urls for the stars and movie
+            movie_url = get_google_images(movie, driver, 'movie')
+            star2_url = get_google_images(star, driver, 'actor')
+
+            if key == 0:
+                star1_url = get_google_images(connections.people[start_id]['name'], driver, 'actor')
+                scraped_images['route0'] = {
+                    connections.people[start_id]['name']: star1_url,
+                    movie: movie_url,
+                    star: star2_url
+                }
+            
+            else:
+                scraped_images[f'route{key}'] = {
+                    previous_star_name: previous_url,
+                    movie: movie_url,
+                    star: star2_url
+                }
+            
+            previous_url = star2_url
+            previous_star_name = star
+            key += 1
 
         driver.close()
         return jsonify(scraped_images)
@@ -143,7 +165,7 @@ def get_google_images(search_query, driver, search_filter):
         query += substring
         query += '+'
 
-    # Making the search url
+    # Making a custom url based on a movie or actor
     if search_filter == 'movie':
         url = f'https://www.google.com/search?q={query}+movie+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     else:

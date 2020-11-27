@@ -51,15 +51,44 @@ def main():
     '''
     Main function call
     '''
-    load_data('small')
+    load_data('large')
+    print('Data Loaded')
 
-    path =  find_connection('200', '197')
+    path =  find_connection('947447', '65743')
     if path == None:
         return
     else:
         print(path)
+
+    a = format_url(path, '947447')
+    print(a)
     
     degrees = len(path)
+
+
+def format_url(path: list, start_id):
+    connection = dict()
+    key = 0
+    previous_star_id = None
+    for movie_id, star_id in path:
+        print(movie_id, star_id)
+        if key == 0:
+            connection['route0'] = {
+                'star1': people[start_id]['name'],
+                'movie': movies[movie_id]["title"],
+                'star2': people[star_id]["name"]
+            }
+            previous_star_id = star_id
+        else:
+            connection[f'route{key}'] = {
+                'star1': people[previous_star_id]['name'],
+                'movie': movies[movie_id]["title"],
+                'start': people[star_id]["name"]
+            }
+            previous_star_id = star_id
+        key += 1
+    return connection
+
 
 def find_connection(start_id, end_id):
     '''
