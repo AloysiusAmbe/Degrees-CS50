@@ -1,21 +1,4 @@
 
-// var memoryLoaded = false;
-// if (!memoryLoaded) {
-//     $('body').css('opacity', '0.1');
-//     $('#clackers').css('display', 'flex');
-
-//     // Server request
-//     const load_data_request = new XMLHttpRequest();
-//     load_data_request.open('POST', '/load_data');
-//     load_data_request.onload = () => {
-//         $('body').css('opacity', '1');
-//         $('#clackers').css('display', 'none');
-//         memoryLoaded = true;
-//     }
-//     load_data_request.send();
-// }
-
-
 // Initializing needed variables
 var scraped_data;
 var current_slide = 0;
