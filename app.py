@@ -1,10 +1,9 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import time
-
 from flask import Flask, render_template, redirect, url_for, request, jsonify
-import connections
+from bs4 import BeautifulSoup
+import time, connections, requests
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -22,7 +21,7 @@ def find_connection():
     if request.method == 'GET':
         return redirect(url_for('index'))
 
-    # Post requesthns
+    # Post requests
     else:
         # Getting front-end data
         query_by_star_name = request.form.get('by_star_name')
@@ -106,9 +105,10 @@ def find_connection():
                 key += 1
             return jsonify(connection)
 
-        # User chooses to use wikipedia images - fast but image not guarenteed
-        if speed_option == 'wiki':
-            pass
+        scraped_images = dict()
+        key = 0
+        previous_url = None
+        previous_star_name = None
 
         # Selenium setup
         PATH = 'C:\Program Files (x86)\Chromedriver.exe'
@@ -116,22 +116,53 @@ def find_connection():
         options.add_argument('--headless')
         driver = webdriver.Chrome(PATH, options=options)
 
-        scraped_images = dict()
-        key = 0
-        previous_url = None
-        previous_star_name = None
+        # Gets images from wikipedia
+        if speed_option == 'wiki':
+            for movie_id, star_id in path:
+                star = connections.people[star_id]["name"]
+                movie = connections.movies[movie_id]["title"]
+                year = connections.movies[movie_id]['year']
 
+                # Gets the star's image and movie poster
+                url = get_wiki_images(star)
+                movie_url = get_poster(movie, year, driver)
+
+                if key == 0:
+                    star1_url = get_wiki_images(connections.people[start_id]['name'])
+                    scraped_images['route0'] = {
+                        connections.people[start_id]['name']: star1_url,
+                        movie: movie_url,
+                        star: url
+                    }
+
+                else:
+                    scraped_images[f'route{key}'] = {
+                        previous_star_name: previous_url,
+                        movie: movie_url,
+                        star: url
+                    }
+
+                previous_url = url
+                previous_star_name = star
+                key += 1
+            
+            driver.close()
+            return jsonify(scraped_images)
+
+        # Uses selenium to get images from google
         for movie_id, star_id in path:
-            # Gets the star's name and name of movie
+            # Gets the star's name and movie title
             movie = connections.movies[movie_id]["title"]
+            movie_year = connections.movies[movie_id]['year']
             star = connections.people[star_id]["name"]
+            birth = connections.people[star_id]['birth']
 
             # Gets the image urls for the stars and movie
-            movie_url = get_google_images(movie, driver, 'movie')
-            star2_url = get_google_images(star, driver, 'actor')
+            movie_url = get_google_images(movie, movie_year, driver, 'movie')
+            star2_url = get_google_images(star, birth, driver, 'actor')
 
             if key == 0:
-                star1_url = get_google_images(connections.people[start_id]['name'], driver, 'actor')
+                star1_url = get_google_images(connections.people[start_id]['name'], connections.people[start_id]['birth'], driver, 'actor')
                 scraped_images['route0'] = {
                     connections.people[start_id]['name']: star1_url,
                     movie: movie_url,
@@ -153,22 +184,25 @@ def find_connection():
         return jsonify(scraped_images)
 
 
-def get_google_images(search_query, driver, search_filter):
+def get_google_images(search_query, year, driver, search_filter):
     '''
     Scrapes for the image from google based on the search query entered.
     Returns the image's url.
     '''
-    # Formatting the search query
-    search_query = search_query.split()
-    query = ''
-    for substring in search_query:
-        query += substring
-        query += '+'
 
-    # Making a custom url based on a movie or actor
+    # Gets movie poster
     if search_filter == 'movie':
-        url = f'https://www.google.com/search?q={query}+movie+poster&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+        poster = get_poster(search_query, year, driver)
+        return poster
+
+    # Gets star's image
     else:
+        # Formatting the search query
+        search_query = search_query.split()
+        query = ''
+        for substring in search_query:
+            query += substring
+            query += '+'
         url = f'https://www.google.com/search?q={query}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
     driver.get(url)
 
@@ -184,12 +218,65 @@ def get_google_images(search_query, driver, search_filter):
     return None
 
 
-def get_wiki_images(search_query):
+def get_wiki_images(actor):
     '''
     User opsts to get images from wikipedia.
     Is fast but the images are not guarenteed to be displayed.
     '''
-    pass
+
+    url = 'https://en.wikipedia.org/wiki/'
+
+    # Formats the actor's name into url
+    name_substrings = actor.split()
+    for substring in name_substrings:
+        url += substring
+        url += "_"
+    response = requests.get(url)
+
+    img = 'None'
+
+    # Checks to make sure the response was successful
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Scraps the actor's image
+        images = soup.find_all('img')
+        for image in images:
+            if image['src'][-3:].lower() == 'jpg':
+                img = image['src']
+                break
+    return img
+
+
+def get_poster(movie, year, driver):
+    '''
+    Gets the movie poster using the Movie Database API.
+    If the response failed, we'll get the image using google images.
+    '''
+    
+    url = f'https://api.themoviedb.org/3/search/movie?api_key=15d2ea6d0dc1d476efbca3eba2b9bbfb&query='
+
+    # Formats the actor's name into url
+    substrings = movie.split()
+    for substring in substrings:
+        url += substring
+        url += "+"
+
+    response = requests.get(url)
+
+    # Makes sure response was successful
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            poster = 'http://image.tmdb.org/t/p/w500/' + data['results'][0]['poster_path']
+        except IndexError:
+            poster = get_google_images(movie, year, driver, 'movie')
+        return poster
+
+    else:
+        # Uses google images if request is unsuccessful
+        poster = get_google_images(movie, year, driver, 'movie')
+        return poster
 
 
 @app.route("/gethint", methods=["POST", "GET"])
