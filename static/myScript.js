@@ -43,6 +43,7 @@ $('#by-star-id-btn').click(function() {
 
 // Sends the entered data to the server to get the connection between two actors
 function getConnectionsFromServer(data_to_send) {
+    current_slide = 0;
     // Gets the chosen speed by the user
     let speed_option = document.querySelector('input[name=option]:checked').value;
     speed_option = speed_option.toLowerCase();
@@ -69,7 +70,7 @@ function getConnectionsFromServer(data_to_send) {
 
     // When request finish loading
     request.onload = () => {
-        var data = JSON.parse(request.responseText); // Extracts the JSON data
+        let data = JSON.parse(request.responseText); // Extracts the JSON data
         scraped_data = data;
         $('#clackers').css('display', 'none');
 
