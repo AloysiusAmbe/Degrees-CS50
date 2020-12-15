@@ -233,7 +233,7 @@ def get_wiki_images(actor):
         url += "_"
     response = requests.get(url)
 
-    img = 'None'
+    img = None
 
     # Checks to make sure the response was successful
     if response.status_code == 200:
@@ -269,9 +269,12 @@ def get_poster(movie, year, driver):
         data = response.json()
         try:
             poster = 'http://image.tmdb.org/t/p/w500/' + data['results'][0]['poster_path']
+            return poster
         except IndexError:
             poster = get_google_images(movie, year, driver, 'movie')
-        return poster
+            print('Error raised')
+            print(poster)
+            return poster
 
     else:
         # Uses google images if request is unsuccessful

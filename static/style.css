@@ -102,6 +102,10 @@ circle:nth-of-type(4) { fill: #f27c21; }
     text-align: center;
 }
 
+#images input {
+    z-index: 100000;
+}
+
 #images .circle-btn {
     display: block;
     height: 50px;
@@ -110,9 +114,11 @@ circle:nth-of-type(4) { fill: #f27c21; }
     border: 1px solid #fefefe;
     margin-top: 24px;
     font-size:22px;
+    outline: none;
 }
 /* scraped images end */
 
+/* Error message div */
 #message {
     position: absolute;
     transform: translate(-50%, -5%);
@@ -121,11 +127,9 @@ circle:nth-of-type(4) { fill: #f27c21; }
     top: 5%;
     font-size: 20px;
 }
+/* Error message div end */
 
-#images input {
-    z-index: 100000;
-}
-
+/* Div for when a start has multiple names */
 #first, #second {
     display: flex;
     flex-direction: column;
@@ -143,14 +147,24 @@ circle:nth-of-type(4) { fill: #f27c21; }
 #multiple-stars h5 {
     margin: 30px 0 0 0;
 }
+/* Div for when a start has multiple names end */
 
+/* Displayes the degree of seperation */
 #degree {
     display: none;
     width: 50%;
     justify-content: center;
     margin: auto;
 }
+/* Displayes the degree of seperation end */
 
 #dont-show {
     height: auto;
+}
+
+/* Name suggestion box */
+#suggestions {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #fff;
 }
